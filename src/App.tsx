@@ -1,9 +1,15 @@
 import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import RegisterPage from './pages/Login/RegisterPage';
 
 function App() {
   return (
     <>
-      <h1 className="text-blue-900 text-center m-5 justify-center">Dashboard Setup Done</h1>
+      <Router>
+        <Routes>
+          <Route path='/register' element={<RegisterPage/>}/>
+        </Routes>
+      </Router>
     </>
   )
 }
