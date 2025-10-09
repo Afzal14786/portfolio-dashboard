@@ -1,5 +1,11 @@
 import React, { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Key, User } from "lucide-react";
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import api from '../api/api'; 
+
+
 import cppCodeHtml from "./AuthBannerCode.html?raw"; 
 
 interface FormData {
@@ -21,21 +27,21 @@ const initialFormData: FormData = {
 const AuthBanner: React.FC = () => (
   <div className="hidden lg:flex lg:w-1/2 bg-[#282C34] text-white font-mono p-8 items-center justify-center relative overflow-auto">
     <pre 
-      className="text-sm leading-6 w-full"
+      className="text-sm leading-6"
       dangerouslySetInnerHTML={{ __html: cppCodeHtml }}
     />
   </div>
 );
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError(null);
   };
 
   const passwordsMatch = formData.password === formData.confirmPassword;
@@ -48,22 +54,54 @@ const Register: React.FC = () => {
     formData.confirmPassword &&
     passwordsMatch;
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     if (!isFormValid) {
-      setError("Please fill all fields and ensure passwords match.");
-      return;
+        toast.error("Please fill all fields and ensure passwords match.");
+        return;
     }
+    
+    if (formData.password.length < 8) {
+        toast.error("Password must be at least 8 characters long.");
+        return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      console.log("Registration Data:", formData);
-      alert(`Registration successful for ${formData.email}`);
-      setIsSubmitting(false);
-    }, 1500);
+
+    try {
+        // API call to backend
+        const response = await api.post('/auth/user/register', {
+            name: formData.name,
+            user_name: formData.user_name,
+            email: formData.email,
+            password: formData.password,
+        });
+
+        if (response.data.success) {
+            const registeredEmail = response.data.data?.email || formData.email;
+            
+            toast.success(response.data.message || "Registration successful! Check your email for verification.");            
+            
+            const verificationUrl = `/verify-otp-page?email=${encodeURIComponent(registeredEmail)}`;
+            navigate(verificationUrl);
+        }
+        
+    } catch (err) {
+        const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
+            ? err.response.data.message
+            : "Registration failed. Please check your network.";
+        
+        toast.error(errorMessage);
+        console.error("Registration failed:", errorMessage, err);
+
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
-    alert(`Redirecting to ${provider} login...`);
+    toast.info(`Redirecting to ${provider} login...`);
   };
   
   return (
@@ -187,8 +225,6 @@ const Register: React.FC = () => {
                 <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
               )}
             </div>
-
-            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
             {/* register button */}
             <button
