@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Mail, Key, User, Github, Chrome } from 'lucide-react'; 
+import React, { useState, type FormEvent } from "react";
+import { Mail, Key, User } from "lucide-react";
+import cppCodeHtml from "./AuthBannerCode.html?raw"; 
 
 interface FormData {
   name: string;
@@ -9,276 +10,267 @@ interface FormData {
   confirmPassword: string;
 }
 
-interface InputFieldProps {
-  id: keyof FormData;
-  label: string;
-  placeholder: string;
-  type?: string;
-  icon: React.ElementType;
-  isError?: boolean;
-  colSpan?: 'full' | 'half';
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+const initialFormData: FormData = {
+  name: "",
+  user_name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
-
-const InputField: React.FC<InputFieldProps> = ({
-  id,
-  label,
-  placeholder,
-  type = 'text',
-  icon: Icon,
-  isError = false,
-  colSpan = 'full',
-  value,
-  onChange,
-}) => (
-  <div
-    className={`flex flex-col space-y-1 ${
-      colSpan === 'half' ? 'lg:col-span-1' : 'lg:col-span-2 col-span-2'
-    }`}
-  >
-    <label htmlFor={id} className="text-sm font-medium text-gray-200">
-      {label}
-    </label>
-    <div className="relative">
-      <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-indigo-400" />
-      <input
-        id={id}
-        name={id}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required
-        className={`
-          w-full py-3 pl-12 pr-4 text-white
-          bg-gray-800 border-2 rounded-lg 
-          focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400
-          transition duration-200 ease-in-out
-          ${isError ? 'border-red-500' : 'border-gray-700'}
-        `}
-      />
-    </div>
-  </div>
-);
-
-const SocialSignIn: React.FC = () => (
-  <div className="mt-8 space-y-4">
-    <h2 className="text-sm text-gray-400 font-semibold uppercase tracking-wider">
-      Or Sign Up With
-    </h2>
-
-    {/* GitHub Button */}
-    <button
-      className="w-full flex items-center justify-center py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition duration-200 shadow-md transform hover:scale-[1.01] focus:ring-2 focus:ring-cyan-500"
-      onClick={() => alert('GitHub Login Clicked')}
-    >
-      <Github className="h-6 w-6 mr-3 text-white" />
-      Sign In with GitHub
-    </button>
-
-    {/* Google Button */}
-    <button
-      className="w-full flex items-center justify-center py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition duration-200 shadow-md transform hover:scale-[1.01] focus:ring-2 focus:ring-cyan-500"
-      onClick={() => alert('Google Login Clicked')}
-    >
-      <Chrome className="h-6 w-6 mr-3 text-red-400" />
-      Sign In with Google
-    </button>
-
-    <p className="text-sm text-center text-gray-400 pt-4">
-      Already have an account?{' '}
-      <a
-        href="#"
-        className="text-cyan-400 hover:text-cyan-300 font-bold transition duration-200"
-      >
-        Sign In
-      </a>
-    </p>
+const AuthBanner: React.FC = () => (
+  <div className="hidden lg:flex lg:w-1/2 bg-[#282C34] text-white font-mono p-8 items-center justify-center relative overflow-auto">
+    <pre 
+      className="text-sm leading-6 w-full"
+      dangerouslySetInnerHTML={{ __html: cppCodeHtml }}
+    />
   </div>
 );
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    user_name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(null);
-  }, []);
+  };
 
-  const passwordsMatch = useMemo(
-    () => formData.password === formData.confirmPassword,
-    [formData.password, formData.confirmPassword]
-  );
+  const passwordsMatch = formData.password === formData.confirmPassword;
+  
+  const isFormValid =
+    formData.name &&
+    formData.user_name &&
+    formData.email &&
+    formData.password &&
+    formData.confirmPassword &&
+    passwordsMatch;
 
-  const isFormValid = useMemo(() => {
-    const { name, user_name, email, password, confirmPassword } = formData;
-    return (
-      name && user_name && email && password && confirmPassword && passwordsMatch
-    );
-  }, [formData, passwordsMatch]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFormValid) {
-      setError('Please fill all fields and ensure passwords match.');
+      setError("Please fill all fields and ensure passwords match.");
       return;
     }
-
     setIsSubmitting(true);
-    setError(null);
-
-    console.log('Submitting:', formData);
-
     setTimeout(() => {
+      console.log("Registration Data:", formData);
+      alert(`Registration successful for ${formData.email}`);
       setIsSubmitting(false);
-      alert('Registration initiated! Check your email for verification.');
     }, 1500);
   };
 
+  const handleSocialLogin = (provider: string) => {
+    alert(`Redirecting to ${provider} login...`);
+  };
+  
   return (
-    <div className="min-h-screen bg-gray-900 p-4 sm:p-8 flex items-center justify-center font-inter">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] bg-gray-800 overflow-hidden">
-        {/* Left Banner Section */}
-        <div className="hidden lg:flex lg:w-1/3 min-h-[600px] bg-indigo-900/50 items-center justify-center p-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 to-purple-900 opacity-80"></div>
-          <div className="absolute top-1/4 left-1/4 h-64 w-64 bg-cyan-500 rounded-full mix-blend-soft-light filter blur-3xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 h-64 w-64 bg-fuchsia-500 rounded-full mix-blend-soft-light filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col lg:flex-row">
+        
+        {/* left : C++ code */}
+        <AuthBanner />
 
-          <div className="relative z-10 text-center">
-            <h2 className="text-4xl font-mono font-bold text-white mb-4">
-              {'<Codebase />'}
-            </h2>
-            <p className="text-lg text-gray-300 italic">
-              Your hub for software engineering tasks.
-            </p>
-          </div>
-        </div>
-
-        {/* Right Side Form */}
-        <div className="w-full lg:w-2/3 p-6 sm:p-12">
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="w-16 h-16 rounded-full border-4 border-cyan-500 bg-gray-900 flex items-center justify-center text-cyan-300 shadow-xl">
-              <User className="h-8 w-8" />
+        {/* right : registration form */}
+        <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="flex items-center mb-10">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
+              <img src="/images/code.png" alt="logo" />
             </div>
-            <h1 className="text-4xl font-extrabold text-white tracking-wider">
-              Welcome
-            </h1>
+            <h1 className="text-2xl font-extrabold text-gray-800">TerminalX</h1>
           </div>
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create an Account 👋</h2>
+          <p className="text-gray-500 mb-8">Please enter your details to register.</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                id="name"
-                label="Name"
-                placeholder="Enter Your Name"
-                icon={User}
-                colSpan="half"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              <InputField
+            
+            {/* Full Name Input */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Username Input */}
+            <div>
+              <label htmlFor="user_name" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <input
                 id="user_name"
-                label="User Name"
-                placeholder="Enter Your Username"
-                icon={User}
-                colSpan="half"
+                name="user_name"
+                type="text"
+                required
                 value={formData.user_name}
                 onChange={handleChange}
+                placeholder="johndoe123"
+                className="w-full pl-3 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
               />
             </div>
 
-            <InputField
-              id="email"
-              label="Email"
-              placeholder="iam.engineer@example.com"
-              type="email"
-              icon={Mail}
-              value={formData.email}
-              onChange={handleChange}
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                id="password"
-                label="Password"
-                placeholder="Enter Password"
-                type="password"
-                icon={Key}
-                colSpan="half"
-                value={formData.password}
-                onChange={handleChange}
-                isError={!passwordsMatch && formData.confirmPassword.length > 0}
-              />
-              <InputField
-                id="confirmPassword"
-                label="Confirm Password"
-                placeholder="Enter again"
-                type="password"
-                icon={Key}
-                colSpan="half"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                isError={!passwordsMatch && formData.confirmPassword.length > 0}
-              />
+            {/* Email Input */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+              </div>
             </div>
 
-            {error && (
-              <p className="text-sm text-center text-red-400 font-medium">
-                {error}
-              </p>
-            )}
-            {!passwordsMatch && formData.confirmPassword.length > 0 && (
-              <p className="text-sm text-center text-red-400 font-medium">
-                Passwords do not match.
-              </p>
-            )}
+            {/* Password Input */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            {/* Confirm Password Input */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ${
+                    passwordsMatch || formData.confirmPassword.length === 0
+                      ? "border-gray-300"
+                      : "border-red-500"
+                  }`}
+                />
+              </div>
+              {!passwordsMatch && formData.confirmPassword.length > 0 && (
+                <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
+              )}
+            </div>
+
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+            {/* register button */}
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className={`w-full py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ${
+                isFormValid && !isSubmitting
+                  ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
+            >
+              {isSubmitting ? "Registering..." : "Register"}
+            </button>
+
+            {/* divider */}
+            <div className="flex items-center my-6">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="mx-3 text-gray-500 text-sm">or</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            {/* Social Signups */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Google */}
               <button
                 type="button"
-                onClick={() =>
-                  setFormData({
-                    name: '',
-                    user_name: '',
-                    email: '',
-                    password: '',
-                    confirmPassword: '',
-                  })
-                }
-                className="py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition duration-200"
+                onClick={() => handleSocialLogin("Google")}
+                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
               >
-                Cancel
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 48 48"
+                  className="w-5 h-5"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.64 1.22 9.12 3.6l6.8-6.8C35.88 2.6 30.3 0 24 0 14.64 0 6.64 5.42 2.56 13.34l7.94 6.18C12.3 13.3 17.64 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M46.98 24.5c0-1.64-.15-3.22-.42-4.75H24v9h13.02c-.6 3.1-2.36 5.74-4.97 7.54l7.78 6.04C44.6 38.5 46.98 31.9 46.98 24.5z"
+                  />
+                  <path
+                    fill="#4A90E2"
+                    d="M24 48c6.48 0 11.92-2.15 15.9-5.85l-7.78-6.04c-2.16 1.45-4.93 2.29-8.12 2.29-6.26 0-11.56-4.22-13.48-9.9l-7.94 6.18C6.64 42.58 14.64 48 24 48z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.52 28.5c-.46-1.38-.72-2.86-.72-4.5s.26-3.12.72-4.5l-7.94-6.18C.9 16.64 0 20.2 0 24s.9 7.36 2.58 10.68l7.94-6.18z"
+                  />
+                </svg>
+                <span className="font-medium text-gray-700">
+                  Sign in with Google
+                </span>
               </button>
+
+              {/* GitHub */}
               <button
-                type="submit"
-                disabled={!isFormValid || isSubmitting}
-                className={`
-                  py-3 font-semibold rounded-lg transition duration-200
-                  ${
-                    isFormValid && !isSubmitting
-                      ? 'bg-cyan-500 text-gray-900 hover:bg-cyan-400 shadow-lg shadow-cyan-500/30'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  }
-                `}
+                type="button"
+                onClick={() => handleSocialLogin("GitHub")}
+                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition"
               >
-                {isSubmitting ? 'Registering...' : 'Submit'}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.84 10.93c.57.1.77-.25.77-.55v-2c-3.18.7-3.85-1.54-3.85-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.03-.7.08-.69.08-.69 1.15.08 1.75 1.18 1.75 1.18 1.01 1.74 2.66 1.24 3.31.95.1-.73.4-1.24.72-1.52-2.54-.3-5.22-1.27-5.22-5.64 0-1.25.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.14 1.18a10.8 10.8 0 0 1 5.72 0c2.18-1.49 3.14-1.18 3.14-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.09 0 4.39-2.68 5.33-5.23 5.62.41.35.78 1.05.78 2.12v3.14c0 .31.21.66.78.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
+                  />
+                </svg>
+                <span className="font-medium">Sign in with GitHub</span>
               </button>
             </div>
-          </form>
 
-          <SocialSignIn />
+            <p className="text-center text-sm text-gray-500 mt-6">
+              Already have an account?{" "}
+              <a href="/login" className="text-blue-600 font-medium hover:underline">Sign In</a>
+            </p>
+          </form>
         </div>
       </div>
     </div>
