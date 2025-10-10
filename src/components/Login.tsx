@@ -1,5 +1,9 @@
 import React, { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import axios from "axios";
+import api from "../api/api";
+import { toast } from "react-toastify";
 
 interface FormData {
   email: string;
@@ -39,6 +43,7 @@ const AuthBanner: React.FC = () => (
 
 // login
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,14 +52,37 @@ const Login: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      console.log("Login Data:", formData);
-      alert(`Logging in as: ${formData.email}`);
+
+    try {
+      const res = await api.post("/auth/user/login", formData);
+      if (res.data.success) {
+        toast.success(res.data.message || "Login successful!");
+        navigate("/dashboard"); 
+      }
+    } catch (error) {
+      // Handle errors
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        const message = error.response.data.message || "An unexpected error occurred.";
+
+        if (status === 403) {
+            toast.error(message);
+            // Redirect to a verification page, passing the email for potential resend OTP
+            navigate(`/verify-otp?email=${formData.email}`); 
+        } else {
+            // General error for 400 (Invalid credentials) or other errors
+            toast.error(message);
+        }
+      } else {
+        // Network or other generic error
+        toast.error("Network error. Could not connect to server.");
+      }
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
