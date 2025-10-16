@@ -166,7 +166,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
               </div>
               <div className="text-right mt-2">
                 <a
-                  href="#"
+                  href="/forgot-password"
                   className="text-sm text-blue-600 hover:underline font-medium"
                 >
                   Forgot password?
@@ -224,7 +224,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                     d="M10.52 28.5c-.46-1.38-.72-2.86-.72-4.5s.26-3.12.72-4.5l-7.94-6.18C.9 16.64 0 20.2 0 24s.9 7.36 2.58 10.68l7.94-6.18z"
                   />
                 </svg>
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 cursor-pointer">
                   Sign in with Google
                 </span>
               </button>
@@ -246,7 +246,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                     d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.84 10.93c.57.1.77-.25.77-.55v-2c-3.18.7-3.85-1.54-3.85-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.03-.7.08-.69.08-.69 1.15.08 1.75 1.18 1.75 1.18 1.01 1.74 2.66 1.24 3.31.95.1-.73.4-1.24.72-1.52-2.54-.3-5.22-1.27-5.22-5.64 0-1.25.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.14 1.18a10.8 10.8 0 0 1 5.72 0c2.18-1.49 3.14-1.18 3.14-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.09 0 4.39-2.68 5.33-5.23 5.62.41.35.78 1.05.78 2.12v3.14c0 .31.21.66.78.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
                   />
                 </svg>
-                <span className="font-medium">Sign in with GitHub</span>
+                <span className="font-medium cursor-pointer">Sign in with GitHub</span>
               </button>
             </div>
 
