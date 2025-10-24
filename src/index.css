@@ -12,3 +12,24 @@
     /* For Firefox */
     scrollbar-width: none;  
 }
+
+/* Consistent cursor behavior */
+button, 
+a, 
+[role="button"], 
+input[type="submit"], 
+input[type="button"] {
+  cursor: pointer;
+}
+
+button:disabled, 
+input:disabled {
+  cursor: not-allowed;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  cursor: text;
+}

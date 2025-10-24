@@ -41,7 +41,6 @@ const AuthBanner: React.FC = () => (
   </div>
 );
 
-// login
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -52,32 +51,62 @@ const Login: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const res = await api.post("/auth/user/login", formData);
+      const res = await api.post("/auth/login", formData);
+
       if (res.data.success) {
-        toast.success(res.data.message || "Login successful!");
-        navigate("/dashboard"); 
+        toast.success(res.data.message || "OTP sent to your email!");
+
+        // Navigate to OTP verification with login type
+        navigate(
+          `/verify-otp?email=${encodeURIComponent(formData.email)}&type=login`
+        );
       }
     } catch (error) {
-      // Handle errors
+      console.error("Login error:", error);
+
       if (axios.isAxiosError(error) && error.response) {
         const status = error.response.status;
-        const message = error.response.data.message || "An unexpected error occurred.";
+        const message =
+          error.response.data.message || "An unexpected error occurred.";
 
-        if (status === 403) {
+        switch (status) {
+          case 403:
             toast.error(message);
-            // Redirect to a verification page, passing the email for potential resend OTP
-            navigate(`/verify-otp?email=${formData.email}`); 
-        } else {
-            // General error for 400 (Invalid credentials) or other errors
+            navigate(
+              `/verify-otp?email=${encodeURIComponent(
+                formData.email
+              )}&type=login`
+            );
+            break;
+          case 401:
+            toast.error("Invalid email or password");
+            setFormData((prev) => ({ ...prev, password: "" }));
+            break;
+          case 422:
+            toast.error("Please check your input fields");
+            break;
+          case 429:
+            toast.error("Too many attempts. Please try again later.");
+            break;
+          case 500:
+            toast.error("Server error. Please try again later.");
+            break;
+          default:
             toast.error(message);
         }
       } else {
-        // Network or other generic error
         toast.error("Network error. Could not connect to server.");
       }
     } finally {
@@ -86,7 +115,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   };
 
   const handleSocialLogin = (provider: string) => {
-    alert(`Redirecting to ${provider} login...`);
+    toast.info(`Redirecting to ${provider} login...`);
   };
 
   return (
@@ -97,11 +126,13 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
           {/* Logo */}
           <div className="flex items-center mb-10">
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
-              <img src="/images/code.png" alt="code icon" />
+              <img
+                src="/images/code.png"
+                alt="code icon"
+                className="w-11 h-11"
+              />
             </div>
-            <h1 className="text-2xl font-extrabold text-gray-800">
-              TerminalX
-            </h1>
+            <h1 className="text-2xl font-extrabold text-gray-800">TerminalX</h1>
           </div>
 
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -130,7 +161,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                 />
               </div>
             </div>
@@ -153,12 +184,12 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 cursor-text"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition duration-200 cursor-pointer"
                   aria-label="Toggle Password Visibility"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -178,13 +209,20 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ${
+              className={`w-full py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 cursor-pointer ${
                 isLoading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"
               }`}
             >
-              {isLoading ? "Signing In..." : "Sign In"}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                "Sign In"
+              )}
             </button>
 
             {/* Divider */}
@@ -200,7 +238,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
               <button
                 type="button"
                 onClick={() => handleSocialLogin("Google")}
-                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
+                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-200 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -224,7 +262,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                     d="M10.52 28.5c-.46-1.38-.72-2.86-.72-4.5s.26-3.12.72-4.5l-7.94-6.18C.9 16.64 0 20.2 0 24s.9 7.36 2.58 10.68l7.94-6.18z"
                   />
                 </svg>
-                <span className="font-medium text-gray-700 cursor-pointer">
+                <span className="font-medium text-gray-700">
                   Sign in with Google
                 </span>
               </button>
@@ -233,7 +271,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
               <button
                 type="button"
                 onClick={() => handleSocialLogin("GitHub")}
-                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition"
+                className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition duration-200 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -246,16 +284,16 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
                     d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.84 10.93c.57.1.77-.25.77-.55v-2c-3.18.7-3.85-1.54-3.85-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.03-.7.08-.69.08-.69 1.15.08 1.75 1.18 1.75 1.18 1.01 1.74 2.66 1.24 3.31.95.1-.73.4-1.24.72-1.52-2.54-.3-5.22-1.27-5.22-5.64 0-1.25.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.14 1.18a10.8 10.8 0 0 1 5.72 0c2.18-1.49 3.14-1.18 3.14-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.09 0 4.39-2.68 5.33-5.23 5.62.41.35.78 1.05.78 2.12v3.14c0 .31.21.66.78.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
                   />
                 </svg>
-                <span className="font-medium cursor-pointer">Sign in with GitHub</span>
+                <span className="font-medium">Sign in with GitHub</span>
               </button>
             </div>
 
             {/* Sign Up Link */}
             <p className="text-center text-sm text-gray-500 mt-6">
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <a
                 href="/register"
-                className="text-blue-600 font-medium hover:underline"
+                className="text-blue-600 font-medium hover:underline cursor-pointer transition duration-200"
               >
                 Sign Up
               </a>
