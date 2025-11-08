@@ -1,6 +1,6 @@
 import LoginPage from '../pages/Login/LoginPage';
 import RegisterPage from '../pages/Login/RegisterPage';
-import Dashboard from '../pages/Dashboard/Dashboard';
+import DashboardPage from '../pages/Dashboard/DashboardPage';
 import OtpVerification from '../components/OtpVerification';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
@@ -27,7 +27,7 @@ export const routes: RouteConfig[] = [
   { path: '/reset-password', component: ResetPassword, requireAuth: false },
   
   // Protected routes
-  { path: '/dashboard', component: Dashboard, requireAuth: true },
+  { path: '/dashboard', component: DashboardPage, requireAuth: true },
   
   // Default route
   { path: '/', component: RedirectToDashboard, requireAuth: true },
