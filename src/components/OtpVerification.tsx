@@ -48,16 +48,16 @@ const OtpVerification: React.FC = () => {
         title: "Verify Your Email",
         description: "Enter the 6-digit code to complete your registration",
         successMessage: "Account verified successfully!",
-        endpoint: "/auth/register/verify-otp",
-        resendEndpoint: "/auth/otp/resend", // ✅ Use the new OTP resend endpoint
+        endpoint: "/admin-auth/signup/verify-otp",
+        resendEndpoint: "/admin-auth/auth-otp/resend",
         redirectTo: "/login",
       },
       login: {
         title: "Login Verification",
         description: "Enter the 6-digit code to complete your login",
         successMessage: "Login successful!",
-        endpoint: "/auth/login/verify",
-        resendEndpoint: "/auth/otp/resend", // ✅ Use the new OTP resend endpoint
+        endpoint: "/admin-auth/signin/verify",
+        resendEndpoint: "/admin-auth/auth-otp/resend",
         redirectTo: redirectTo,
       },
       "reset-password": {
@@ -65,7 +65,7 @@ const OtpVerification: React.FC = () => {
         description: "Enter the 6-digit code to reset your password",
         successMessage: "Password reset verified!",
         endpoint: "/user/password/reset/verify-otp",
-        resendEndpoint: "/auth/otp/resend", // ✅ Use the new OTP resend endpoint
+        resendEndpoint: "/auth/otp/resend",
         redirectTo: "/reset-password",
       },
       "update-password": {
@@ -73,7 +73,7 @@ const OtpVerification: React.FC = () => {
         description: "Enter the 6-digit code to update your password",
         successMessage: "Password update verified!",
         endpoint: "/user/password/update/verify-otp",
-        resendEndpoint: "/auth/otp/resend", // ✅ Use the new OTP resend endpoint
+        resendEndpoint: "/auth/otp/resend",
         redirectTo: "/settings",
       },
       "email-update": {

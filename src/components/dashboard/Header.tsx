@@ -45,7 +45,7 @@ const Header: React.FC = () => {
       const toastId = toast.loading('Logging out...');
       
       // call logout API
-      const response = await api.post('/auth/logout');
+      const response = await api.post('/admin-auth/signin/logout');
       
       // clear local storage
       localStorage.removeItem('accessToken');

@@ -75,7 +75,7 @@ const ResetPassword: React.FC = () => {
       const response = await api.post("/user/password/reset/verify-otp", {
         token,
         newPassword: formData.password,
-        confirmPassword: formData.confirmPassword, // ← ADD THIS LINE
+        confirmPassword: formData.confirmPassword,
       });
 
       if (response.data.success) {

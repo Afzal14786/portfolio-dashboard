@@ -104,7 +104,7 @@ const Register: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.post('/auth/register', {
+      const response = await api.post('/admin-auth/signup/register', {
         name: formData.name,
         user_name: formData.user_name,
         email: formData.email,
