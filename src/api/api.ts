@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosError } from "axios";
+import type { ApiError } from "../types/ApiError";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080/api/v1',
+  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8080/api/v1",
 });
 
-// Add token to requests
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -16,12 +16,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle responses - NO REDIRECTS!
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Simply reject the error - let components handle navigation
-    return Promise.reject(error);
+  (error: AxiosError<ApiError>) => {
+    const apiError: ApiError = {
+      status: error.response?.status,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "An unknown error occurred",
+      errors: error.response?.data?.errors,
+    };
+    return Promise.reject(apiError);
   }
 );
 

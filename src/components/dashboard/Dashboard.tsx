@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import StatsCard from './StatsCard';
@@ -7,6 +7,8 @@ import VisitorChart from './VisitorChart';
 import { FileText, Briefcase, Award, Cpu } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const statsData = [
     {
       icon: FileText,
@@ -38,33 +40,44 @@ const Dashboard: React.FC = () => {
     }
   ];
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <div className="flex">
         {/* Sidebar */}
-        <Sidebar />
+        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
         
-        {/* main content */}
-        <div className="flex-1 ml-64">
-          <Header />
+        {/* Main Content */}
+        <div className="flex-1 lg:ml-64 min-h-screen">
+          <Header onMenuToggle={toggleSidebar} />
           
-          <main className="p-6">
-            {/* welcome section */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <main className="pt-16 lg:pt-20 p-4 sm:p-6">
+            {/* Welcome Section */}
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 Welcome Back Afzal 👋
               </h1>
+              <p className="text-gray-600 text-sm sm:text-base">
+                Here's what's happening with your account today.
+              </p>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
               {statsData.map((stat, index) => (
                 <StatsCard key={index} {...stat} />
               ))}
             </div>
 
             {/* Analytics Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
               <AnalyticsCard 
                 title="Total Blog Views" 
                 value="1k" 
@@ -80,8 +93,8 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Chart Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2">
                 <h3 className="text-lg font-semibold text-gray-900">
                   Number Of Visitors This Month
                 </h3>
