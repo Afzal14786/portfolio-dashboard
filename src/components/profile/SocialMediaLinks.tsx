@@ -296,22 +296,22 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
       onClick={handleCancel}
     >
       <div 
-        className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md border border-white/50 p-6"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md border border-white/40 p-6 transition-all duration-300 hover:bg-white/90"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-xl">
+            <div className="p-2 bg-purple-100/80 rounded-xl backdrop-blur-sm border border-purple-200/50">
               <Globe className="w-5 h-5 text-purple-600" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               {isEdit ? 'Edit Social Media Link' : 'Add Social Media Link'}
             </h2>
           </div>
           <button
             onClick={handleCancel}
             disabled={isLoading}
-            className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 hover:bg-gray-100/80 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 text-gray-500" />
@@ -327,7 +327,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
               <select
                 value={currentLink.platform}
                 onChange={(e) => handleInputChange('platform', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors disabled:opacity-50"
+                className="w-full px-4 py-3 border border-gray-300/60 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/60 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 hover:bg-white/80 focus:bg-white/80"
                 required={!isEdit}
                 disabled={isLoading || isEdit}
               >
@@ -355,7 +355,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
                 value={currentLink.url}
                 onChange={(e) => handleInputChange('url', e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors disabled:opacity-50"
+                className="w-full px-4 py-3 border border-gray-300/60 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/60 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 hover:bg-white/80 focus:bg-white/80"
                 placeholder="https://example.com/username"
                 required
                 disabled={isLoading}
@@ -372,14 +372,14 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
               type="button"
               onClick={handleCancel}
               disabled={isLoading}
-              className="flex-1 px-4 py-3 border border-gray-300/50 text-gray-700 rounded-2xl hover:bg-gray-50/50 transition-colors backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 border border-gray-300/60 text-gray-700 rounded-2xl hover:bg-gray-50/80 transition-all duration-300 backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!currentLink.platform || !isValidUrl(currentLink.url) || isLoading}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-pink-600 font-medium flex items-center justify-center"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-pink-600 font-medium flex items-center justify-center hover:scale-105"
             >
               {isLoading ? (
                 <>
@@ -398,15 +398,19 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-lg rounded-3xl border border-white/50 shadow-xl p-6 lg:p-8 mb-8">
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl p-6 lg:p-8 mb-8 transition-all duration-300 hover:bg-white/70">
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-100/80 rounded-2xl backdrop-blur-sm">
+            <div className="p-3 bg-purple-100/80 rounded-2xl backdrop-blur-md border border-purple-200/50">
               <Globe className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Social Media</h2>
-              <p className="text-gray-600 mt-1 text-sm lg:text-base">Connect through various platforms</p>
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Social Media
+              </h2>
+              <p className="text-gray-600 mt-1 text-sm lg:text-base">
+                Connect through various platforms
+              </p>
             </div>
           </div>
           
@@ -414,7 +418,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
             <button
               onClick={handleAddClick}
               disabled={isLoading}
-              className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
               aria-label="Add new social media link"
             >
               <Plus className="w-5 h-5" />
@@ -431,14 +435,14 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
               return (
                 <div
                   key={platform}
-                  className="group block p-4 lg:p-6 bg-gradient-to-br from-gray-50/50 to-purple-50/50 rounded-2xl border border-white/50 hover:border-purple-300/50 transition-all duration-200 hover:shadow-lg cursor-pointer backdrop-blur-sm relative"
+                  className="group block p-4 lg:p-6 bg-white/50 backdrop-blur-md rounded-2xl border border-white/60 hover:border-purple-300/60 transition-all duration-300 hover:shadow-xl cursor-pointer hover:scale-105 transform relative"
                 >
                   {/* Action buttons */}
-                  <div className="absolute top-3 right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-3 right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <button
                       onClick={() => handleEditClick(platform, url)}
                       disabled={isLoading}
-                      className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg hover:bg-white transition-colors cursor-pointer disabled:opacity-50"
+                      className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg hover:bg-white transition-all duration-200 cursor-pointer disabled:opacity-50 hover:scale-110"
                       aria-label={`Edit ${config.label}`}
                     >
                       <Edit2 className="w-3 h-3 text-gray-600" />
@@ -446,7 +450,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
                     <button
                       onClick={() => handleDeleteClick(platform)}
                       disabled={isLoading}
-                      className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                      className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg hover:bg-red-50 transition-all duration-200 cursor-pointer disabled:opacity-50 hover:scale-110"
                       aria-label={`Delete ${config.label}`}
                     >
                       <Trash2 className="w-3 h-3 text-red-600" />
@@ -460,7 +464,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
                     className="block"
                   >
                     <div className="flex items-center space-x-3 lg:space-x-4">
-                      <div className={`p-2 lg:p-3 rounded-xl ${config.color} transition-transform group-hover:scale-110 shadow-sm backdrop-blur-sm`}>
+                      <div className={`p-2 lg:p-3 rounded-xl ${config.color} transition-all duration-300 group-hover:scale-110 shadow-sm backdrop-blur-sm group-hover:shadow-md`}>
                         <IconComponent className="w-4 h-4 lg:w-5 lg:h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -482,13 +486,15 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
           <button
             onClick={handleAddClick}
             disabled={isLoading || availablePlatforms.length === 0}
-            className="w-full text-center py-12 lg:py-16 bg-gradient-to-br from-gray-50/50 to-purple-50/50 rounded-2xl border-2 border-dashed border-gray-300/50 hover:border-purple-300/50 transition-all duration-200 cursor-pointer backdrop-blur-sm group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full text-center py-12 lg:py-16 bg-white/50 backdrop-blur-md rounded-2xl border-2 border-dashed border-white/60 hover:border-purple-300/60 transition-all duration-300 cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
             aria-label="Add social media links"
           >
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
               <Plus className="w-6 h-6 lg:w-8 lg:h-8 text-gray-400 group-hover:text-purple-600 transition-colors" />
             </div>
-            <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">Add Social Media Links</h3>
+            <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">
+              Add Social Media Links
+            </h3>
             <p className="text-gray-600 max-w-md mx-auto text-sm lg:text-base">
               Connect your GitHub, LinkedIn, Twitter, and other platforms to share your profiles.
             </p>

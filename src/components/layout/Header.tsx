@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bell, User, Settings, LogOut, HelpCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Bell, User, Settings, LogOut, HelpCircle, Menu } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/api";
+import { useSmartNavigation } from "../../hooks/useSmartNavigation";
 
 interface UserData {
   name: string;
@@ -11,8 +12,13 @@ interface UserData {
   avatar?: string;
 }
 
-const Header: React.FC = () => {
-  const navigate = useNavigate();
+interface HeaderProps {
+  onMenuToggle: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
+  const location = useLocation();
+  const smartNavigate = useSmartNavigation();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,6 +49,11 @@ const Header: React.FC = () => {
   }, []);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+  const handleNavigation = (path: string) => {
+    smartNavigate(path);
+    setIsDropdownOpen(false);
+  };
 
   const handleLogout = async (): Promise<void> => {
     try {
@@ -77,9 +88,18 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 p-3 sm:p-4 shadow-sm w-full">
+    <header className="fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-gray-200 p-3 sm:p-4 shadow-sm z-40 transition-all duration-300">
       <div className="flex items-center justify-between">
-        <div></div>
+        {/* Left Section - Menu Button (for mobile) */}
+        <div className="flex items-center">
+          <button 
+            onClick={onMenuToggle}
+            className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer mr-2"
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
 
         {/* Right Section - Notification & Profile */}
         <div className="flex items-center space-x-3 sm:space-x-4">
@@ -135,26 +155,20 @@ const Header: React.FC = () => {
                   <MenuItem
                     icon={<User className="w-4 h-4 text-gray-600" />}
                     label="Profile"
-                    onClick={() => {
-                      navigate("/profile");
-                      setIsDropdownOpen(false);
-                    }}
+                    onClick={() => handleNavigation("/profile")}
+                    disabled={location.pathname === '/profile'}
                   />
                   <MenuItem
                     icon={<Settings className="w-4 h-4 text-gray-600" />}
                     label="Account Settings"
-                    onClick={() => {
-                      navigate("/settings");
-                      setIsDropdownOpen(false);
-                    }}
+                    onClick={() => handleNavigation("/settings")}
+                    disabled={location.pathname === '/settings'}
                   />
                   <MenuItem
                     icon={<HelpCircle className="w-4 h-4 text-gray-600" />}
                     label="Help Center"
-                    onClick={() => {
-                      navigate("/help");
-                      setIsDropdownOpen(false);
-                    }}
+                    onClick={() => handleNavigation("/help")}
+                    disabled={location.pathname === '/help'}
                   />
                   
                   {/* Divider */}
@@ -181,13 +195,17 @@ const MenuItem: React.FC<{
   label: string;
   onClick: () => void;
   danger?: boolean;
-}> = ({ icon, label, onClick, danger }) => (
+  disabled?: boolean;
+}> = ({ icon, label, onClick, danger, disabled = false }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 rounded-lg sm:rounded-xl transition-colors cursor-pointer ${
-      danger
-        ? "text-red-600 hover:bg-red-50 hover:text-red-700"
-        : "hover:bg-gray-100 sm:hover:bg-gray-200"
+    disabled={disabled}
+    className={`w-full flex items-center px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm rounded-lg sm:rounded-xl transition-colors cursor-pointer ${
+      disabled 
+        ? 'text-gray-400 cursor-not-allowed' 
+        : danger
+          ? "text-red-600 hover:bg-red-50 hover:text-red-700"
+          : "text-gray-700 hover:bg-gray-100 sm:hover:bg-gray-200"
     }`}
   >
     <div className="flex items-center space-x-2 sm:space-x-3">
@@ -195,6 +213,9 @@ const MenuItem: React.FC<{
         {icon}
       </div>
       <span className="font-medium truncate">{label}</span>
+      {disabled && (
+        <span className="text-xs text-gray-400">(current)</span>
+      )}
     </div>
   </button>
 );

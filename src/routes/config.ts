@@ -6,6 +6,10 @@ import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 import NotFound from '../pages/NotFound/NotFound';
 import Profile from '../pages/Profile/ProfilePage';
+import BlogsPage from '../pages/Blogs/BlogsPage';
+import ProjectsPage from '../pages/Project/ProjectPage';
+import CertificatesPage from '../pages/Certificates/CertificatePage';
+import SkillsPage from '../pages/Skills/SkillsPage';
 
 export interface RouteConfig {
   path: string;
@@ -27,9 +31,13 @@ export const routes: RouteConfig[] = [
   { path: '/forgot-password', component: ForgotPassword, requireAuth: false },
   { path: '/reset-password', component: ResetPassword, requireAuth: false },
   
-  // Protected routes
+  // Protected routes (with layout)
   { path: '/dashboard', component: DashboardPage, requireAuth: true },
   { path: '/profile', component: Profile, requireAuth: true },
+  { path: '/blogs', component: BlogsPage, requireAuth: true },
+  { path: '/projects', component: ProjectsPage, requireAuth: true },
+  { path: '/certificates', component: CertificatesPage, requireAuth: true },
+  { path: '/skills', component: SkillsPage, requireAuth: true },
   
   // Default route
   { path: '/', component: RedirectToDashboard, requireAuth: true },

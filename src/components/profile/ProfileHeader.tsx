@@ -437,7 +437,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const renderPlaceholder = (type: "banner" | "profile") => (
     <div className={`w-full h-full bg-gradient-to-br from-gray-200/50 to-gray-300/50 flex items-center justify-center ${
-      type === "profile" ? "rounded-2xl border-4 border-white" : ""
+      type === "profile" ? "rounded-2xl border-4 border-white/80" : ""
     }`}>
       <div className="text-center text-gray-500">
         <ImageIcon className={`${type === "banner" ? "w-16 h-16" : "w-20 h-20 lg:w-24 lg:h-24"} mx-auto mb-2 opacity-60`} />
@@ -447,14 +447,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 
   return (
-    <div className="bg-white/80 backdrop-blur-lg rounded-3xl border border-white/50 shadow-xl overflow-hidden mb-8">
+    <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl overflow-hidden mb-8 transition-all duration-300 hover:bg-white/70">
       {/* Banner Section */}
-      <div className="relative h-48 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20">
+      <div className="relative h-48 bg-gradient-to-br from-blue-400/30 via-purple-500/30 to-pink-500/30 backdrop-blur-sm">
         {userData.banner_image ? (
-          <img src={userData.banner_image} alt="Banner" className="w-full h-full object-cover" />
+          <img 
+            src={userData.banner_image} 
+            alt="Banner" 
+            className="w-full h-full object-cover mix-blend-overlay" 
+          />
         ) : (
           renderPlaceholder("banner")
         )}
+
+        {/* Banner Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 
         <input
           type="file"
@@ -467,7 +474,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <button
           onClick={() => bannerInputRef.current?.click()}
           disabled={isUploading}
-          className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer flex items-center space-x-2 shadow-lg hover:shadow-xl border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md hover:bg-white text-gray-700 px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer flex items-center space-x-2 shadow-lg hover:shadow-xl border border-white/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
         >
           <Camera className="w-4 h-4" />
           <span className="font-medium text-sm">Update Banner</span>
@@ -475,123 +482,125 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       </div>
 
       {/* Profile Info Section */}
-      <div className="px-6 lg:px-8 pb-8">
-        <div className="flex flex-col lg:flex-row items-start lg:items-end lg:space-x-8">
-          
-          {/* Profile Image */}
-          <div className="relative flex-shrink-0 -mt-20 lg:-mt-24 mx-auto lg:mx-0 lg:mr-8">
-            <div className="relative group">
+      <div className="relative px-6 lg:px-8 pb-8 pt-4">
+        {/* Profile Image Container - Overlapping the banner */}
+        <div className="absolute -top-24 left-6 lg:left-8 transform transition-transform duration-300 hover:scale-105">
+          <div className="relative group">
+            <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl border-4 border-white/80 bg-white/80 backdrop-blur-md shadow-2xl overflow-hidden">
               {userData.profile_image ? (
                 <img
                   src={userData.profile_image}
                   alt="Profile"
-                  className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl border-4 border-white object-cover shadow-2xl transition-transform group-hover:scale-105"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                renderPlaceholder("profile")
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <ImageIcon className="w-12 h-12 text-gray-400" />
+                </div>
               )}
+            </div>
 
-              <input
-                type="file"
-                ref={profileInputRef}
-                className="hidden"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={(e) => handleFileChange(e, "profile")}
-              />
+            <input
+              type="file"
+              ref={profileInputRef}
+              className="hidden"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={(e) => handleFileChange(e, "profile")}
+            />
 
-              <button
-                onClick={() => profileInputRef.current?.click()}
-                disabled={isUploading}
-                className="absolute -bottom-2 -right-2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Camera className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </button>
+            <button
+              onClick={() => profileInputRef.current?.click()}
+              disabled={isUploading}
+              className="absolute -bottom-2 -right-2 bg-white/90 backdrop-blur-md hover:bg-white text-gray-700 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group border border-white/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
+            >
+              <Camera className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area - Adjusted for overlapping profile image */}
+        <div className="mt-20 lg:mt-24 flex flex-col lg:flex-row lg:items-start lg:justify-between">
+          {/* Left Section - Name, Username, and Quote */}
+          <div className="flex-1 lg:mr-8">
+            {/* Name and Username */}
+            <div className="mb-6">
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                {userData.name || "No Name"}
+              </h1>
+              <p className="text-lg lg:text-xl text-gray-600 font-medium">
+                @{userData.user_name || "username"}
+              </p>
+            </div>
+
+            {/* Quote Section */}
+            <div className="max-w-2xl">
+              {userData.quote ? (
+                <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
+                  <div className="flex-1">
+                    <p className="text-gray-700 text-base lg:text-lg italic border-l-4 border-blue-400 pl-4 py-3 bg-blue-50/50 rounded-r-xl backdrop-blur-sm break-words shadow-inner">
+                      "{userData.quote}"
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowQuoteModal(true)}
+                    disabled={isUploading}
+                    className="p-2 hover:bg-gray-100/80 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-start hover:scale-105"
+                    aria-label="Edit quote"
+                  >
+                    <Edit2 className="w-4 h-4 text-gray-500" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
+                  <button
+                    onClick={() => setShowQuoteModal(true)}
+                    disabled={isUploading}
+                    className="text-gray-500 text-base lg:text-lg italic border-l-4 border-gray-300 pl-4 py-3 bg-gray-50/50 rounded-r-xl backdrop-blur-sm hover:bg-gray-100/60 transition-colors cursor-pointer break-words flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform transition-transform"
+                  >
+                    "Add a quote about yourself..."
+                  </button>
+                  <button
+                    onClick={() => setShowQuoteModal(true)}
+                    disabled={isUploading}
+                    className="p-2 hover:bg-gray-100/80 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-start hover:scale-105"
+                    aria-label="Add quote"
+                  >
+                    <Edit2 className="w-4 h-4 text-gray-500" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Text Content and Resume Button */}
-          <div className="flex-1 flex flex-col lg:flex-row lg:items-end lg:justify-between min-w-0 mt-6 lg:mt-0">
-            <div className="flex-1 min-w-0 text-center lg:text-left mb-6 lg:mb-0 lg:mr-8">
-              {/* Name and Username */}
-              <div className="mb-8">
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
-                  {userData.name || "No Name"}
-                </h1>
-                <p className="text-lg lg:text-xl text-gray-600">
-                  @{userData.user_name || "username"}
-                </p>
-              </div>
+          {/* Right Section - Resume Button */}
+          <div className="flex-shrink-0 flex justify-center lg:justify-start mt-6 lg:mt-0">
+            <input
+              type="file"
+              ref={resumeInputRef}
+              className="hidden"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              onChange={(e) => handleFileChange(e, "resume")}
+            />
 
-              {/* Quote Section */}
-              <div className="relative group max-w-2xl">
-                {userData.quote ? (
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
-                    <div className="flex-1">
-                      <p className="text-gray-700 text-base lg:text-lg italic border-l-4 border-blue-500 pl-4 py-3 bg-blue-50/30 rounded-r-xl backdrop-blur-sm break-words">
-                        "{userData.quote}"
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setShowQuoteModal(true)}
-                      disabled={isUploading}
-                      className="p-2 hover:bg-gray-100/60 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/30 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-center"
-                      aria-label="Edit quote"
-                    >
-                      <Edit2 className="w-4 h-4 text-gray-500" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
-                    <button
-                      onClick={() => setShowQuoteModal(true)}
-                      disabled={isUploading}
-                      className="text-gray-500 text-base lg:text-lg italic border-l-4 border-gray-300 pl-4 py-3 bg-gray-50/30 rounded-r-xl backdrop-blur-sm hover:bg-gray-100/40 transition-colors cursor-pointer break-words flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      "Add a quote about yourself..."
-                    </button>
-                    <button
-                      onClick={() => setShowQuoteModal(true)}
-                      disabled={isUploading}
-                      className="p-2 hover:bg-gray-100/60 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/30 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-center"
-                      aria-label="Add quote"
-                    >
-                      <Edit2 className="w-4 h-4 text-gray-500" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Resume Button */}
-            <div className="flex-shrink-0 flex justify-center lg:justify-start mt-6 lg:mt-0">
-              <input
-                type="file"
-                ref={resumeInputRef}
-                className="hidden"
-                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                onChange={(e) => handleFileChange(e, "resume")}
-              />
-
-              {userData.resume ? (
-                <button
-                  onClick={() => window.open(userData.resume, "_blank")}
-                  disabled={isUploading}
-                  className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-gray-200/50 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Download className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  <span className="font-semibold text-base whitespace-nowrap">Resume</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => resumeInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-gray-200/50 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Plus className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  <span className="font-semibold text-base whitespace-nowrap">Add Resume</span>
-                </button>
-              )}
-            </div>
+            {userData.resume ? (
+              <button
+                onClick={() => window.open(userData.resume, "_blank")}
+                disabled={isUploading}
+                className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
+              >
+                <Download className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="font-semibold text-base whitespace-nowrap">Resume</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => resumeInputRef.current?.click()}
+                disabled={isUploading}
+                className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
+              >
+                <Plus className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="font-semibold text-base whitespace-nowrap">Add Resume</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

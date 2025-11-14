@@ -71,10 +71,8 @@ const Profile: React.FC = () => {
 
   const handleUpdate = async (type: UpdateType, data: any) => {
     try {
-      // Here you would make API calls to update the data
       console.log(`Updating ${type}:`, data);
       
-      // For now, just update local state
       if (userData) {
         let updatedData = { ...userData };
         
@@ -82,7 +80,6 @@ const Profile: React.FC = () => {
           case 'banner':
           case 'profile':
             if (data.file) {
-              // Handle file upload - in real app, you'd upload to server
               const fileUrl = URL.createObjectURL(data.file);
               if (type === 'banner') {
                 updatedData.banner_image = fileUrl;
@@ -116,8 +113,6 @@ const Profile: React.FC = () => {
         }
         
         setUserData(updatedData);
-        
-        // Update localStorage
         localStorage.setItem('userData', JSON.stringify(updatedData));
       }
     } catch (error) {

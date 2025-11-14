@@ -2,7 +2,7 @@ import React, { useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../api/api";
 import { toast } from "react-toastify";
-import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft, KeyRound } from "lucide-react";
 import axios from "axios";
 
 const ResetPassword: React.FC = () => {
@@ -25,7 +25,6 @@ const ResetPassword: React.FC = () => {
     hasSpecialChar: false,
   });
 
-  // Check password strength
   const checkPasswordStrength = (password: string) => {
     setPasswordStrength({
       hasMinLength: password.length >= 8,
@@ -83,7 +82,6 @@ const ResetPassword: React.FC = () => {
           "Password reset successfully! You can now login with your new password."
         );
 
-        // Redirect to login after success
         setTimeout(() => {
           navigate("/login");
         }, 2000);
@@ -129,34 +127,33 @@ const ResetPassword: React.FC = () => {
     navigate("/login");
   };
 
-  // If no token, show error
   if (!token) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-center">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <div className="text-2xl">❌</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl p-6 lg:p-8 w-full max-w-md text-center">
+          <div className="w-16 h-16 lg:w-20 lg:h-20 bg-red-100/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-200/50">
+            <KeyRound className="w-8 h-8 lg:w-10 lg:h-10 text-red-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-3 lg:mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Invalid Reset Link
           </h1>
 
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4 lg:mb-6 text-sm lg:text-base">
             This password reset link is invalid or has expired. Please request a
             new reset link.
           </p>
 
           <button
             onClick={() => navigate("/forgot-password")}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 cursor-pointer"
+            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold rounded-2xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 cursor-pointer mb-3 transform hover:scale-[1.02]"
           >
             Request New Reset Link
           </button>
 
           <button
             onClick={handleBackToLogin}
-            className="w-full py-3 mt-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition duration-200 cursor-pointer"
+            className="w-full py-3 border border-gray-300/60 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50/80 transition-all duration-300 cursor-pointer"
           >
             Back to Login
           </button>
@@ -166,32 +163,32 @@ const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div
-        className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transition-all duration-300 hover:shadow-3xl"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl p-6 lg:p-8 w-full max-w-md transition-all duration-300 hover:shadow-3xl"
         role="dialog"
         aria-labelledby="reset-password-title"
         aria-modal="true"
       >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <img src="/images/code.png" alt="code icon" className="w-15 h-15"/>
+        <div className="text-center mb-6 lg:mb-8">
+          <div className="w-16 h-16 lg:w-20 lg:h-20 bg-indigo-100/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-200/50">
+            <Lock className="w-8 h-8 lg:w-10 lg:h-10 text-indigo-600" />
           </div>
 
           <h1
             id="reset-password-title"
-            className="text-2xl font-bold text-gray-900 mb-2"
+            className="text-xl lg:text-2xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
           >
             Set New Password
           </h1>
 
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm lg:text-base">
             Create a new password for your account.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
           {/* New Password */}
           <div>
             <label
@@ -211,13 +208,13 @@ const ResetPassword: React.FC = () => {
                 placeholder="Enter new password"
                 required
                 autoComplete="new-password"
-                className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-xl text-base transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 cursor-text"
+                className="w-full pl-10 pr-10 py-3 border-2 border-gray-200/60 rounded-2xl text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-300 bg-white/60 backdrop-blur-sm disabled:opacity-50"
                 disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition duration-200 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-all duration-200 cursor-pointer"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -243,17 +240,17 @@ const ResetPassword: React.FC = () => {
                 placeholder="Confirm new password"
                 required
                 autoComplete="new-password"
-                className={`w-full pl-10 pr-10 py-3 border-2 rounded-xl text-base transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text ${
+                className={`w-full pl-10 pr-10 py-3 border-2 rounded-2xl text-base transition-all duration-300 focus:outline-none focus:ring-2 cursor-text bg-white/60 backdrop-blur-sm disabled:opacity-50 ${
                   formData.confirmPassword && !passwordsMatch
                     ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-                    : "border-gray-200 focus:border-blue-500 hover:border-gray-300"
+                    : "border-gray-200/60 focus:border-indigo-500 focus:ring-indigo-100 hover:border-gray-300"
                 }`}
                 disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition duration-200 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-all duration-200 cursor-pointer"
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -266,11 +263,11 @@ const ResetPassword: React.FC = () => {
           </div>
 
           {/* Password Requirements */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="bg-gray-50/80 backdrop-blur-sm p-3 lg:p-4 rounded-2xl border border-gray-200/60">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
               Password Requirements:
             </h3>
-            <div className="space-y-1 text-sm">
+            <div className="space-y-1 text-xs lg:text-sm">
               <div
                 className={`flex items-center ${
                   passwordStrength.hasMinLength
@@ -299,7 +296,7 @@ const ResetPassword: React.FC = () => {
                 }`}
               >
                 <CheckCircle size={16} className="mr-2" />
-                One lowercase letter {/* ← THIS IS THE FIX */}
+                One lowercase letter
               </div>
               <div
                 className={`flex items-center ${
@@ -333,40 +330,40 @@ const ResetPassword: React.FC = () => {
               !passwordsMatch ||
               !formData.password
             }
-            className={`w-full py-3 text-white font-semibold rounded-xl shadow-lg transition duration-300 flex items-center justify-center space-x-2 cursor-pointer ${
+            className={`w-full py-3 lg:py-4 text-white font-semibold rounded-2xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer ${
               isSubmitting ||
               !isPasswordValid() ||
               !passwordsMatch ||
               !formData.password
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700 transform hover:scale-[1.02] active:scale-[0.98]"
+                : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 transform hover:scale-[1.02] active:scale-[0.98]"
             }`}
           >
             {isSubmitting ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Resetting Password...</span>
+                <span className="text-sm lg:text-base">Resetting Password...</span>
               </>
             ) : (
               <>
                 <Lock size={18} />
-                <span>Reset Password</span>
+                <span className="text-sm lg:text-base">Reset Password</span>
               </>
             )}
           </button>
         </form>
 
         {/* Back to Login */}
-        <div className="text-center mt-6">
+        <div className="text-center mt-4 lg:mt-6">
           <button
             onClick={handleBackToLogin}
-            className="flex items-center justify-center space-x-2 text-gray-600 hover:text-gray-800 transition duration-200 cursor-pointer group"
+            className="flex items-center justify-center space-x-2 text-gray-600 hover:text-gray-800 transition-all duration-200 cursor-pointer group"
           >
             <ArrowLeft
               size={16}
               className="group-hover:-translate-x-1 transition-transform duration-200"
             />
-            <span className="font-medium">Back to Login</span>
+            <span className="font-medium text-sm lg:text-base">Back to Login</span>
           </button>
         </div>
       </div>

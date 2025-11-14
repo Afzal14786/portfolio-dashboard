@@ -115,7 +115,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
 
       // Use the correct endpoint with user_type = 'admin' and correct field name
       const response = await api.patch("/admin/profile/reading-resources", {
-        readingResources: updatedReadingResources, // Changed from reading_resources to readingResources
+        readingResources: updatedReadingResources,
       });
 
       if (!response.data) {
@@ -158,14 +158,14 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
         }
       } else if (error?.response?.status === 401) {
         toast.error("Unauthorized: Please log in again.", {
-          position: "top-right",
-          autoClose: 5000,
-        });
+            position: "top-right",
+            autoClose: 5000,
+          });
       } else if (error?.response?.status === 500) {
         toast.error("Server error. Please try again later.", {
-          position: "top-right",
-          autoClose: 5000,
-        });
+            position: "top-right",
+            autoClose: 5000,
+          });
       } else if (
         error?.code === "NETWORK_ERROR" ||
         error?.message?.includes("Network Error")
@@ -219,14 +219,14 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-lg rounded-3xl border border-white/50 shadow-xl p-6 lg:p-8 mb-8">
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl p-6 lg:p-8 mb-8 transition-all duration-300 hover:bg-white/70">
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-100/80 rounded-2xl backdrop-blur-sm">
+            <div className="p-3 bg-blue-100/80 rounded-2xl backdrop-blur-md border border-blue-200/50">
               <Book className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-900">
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 Reading Resources
               </h2>
               <p className="text-gray-600 mt-1 text-sm lg:text-base">
@@ -239,7 +239,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
             <button
               onClick={handleAddClick}
               disabled={isLoading}
-              className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
               aria-label="Add new reading resource"
             >
               <Plus className="w-5 h-5" />
@@ -255,10 +255,10 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block p-4 lg:p-6 bg-gradient-to-br from-gray-50/50 to-blue-50/50 rounded-2xl border border-white/50 hover:border-blue-300/50 transition-all duration-200 hover:shadow-lg cursor-pointer backdrop-blur-sm"
+                className="group block p-4 lg:p-6 bg-white/50 backdrop-blur-md rounded-2xl border border-white/60 hover:border-blue-300/60 transition-all duration-300 hover:shadow-xl cursor-pointer hover:scale-105 transform"
               >
                 <div className="flex items-start space-x-3 lg:space-x-4">
-                  <div className="p-2 lg:p-3 bg-white/80 rounded-xl shadow-sm group-hover:shadow-md transition-shadow backdrop-blur-sm">
+                  <div className="p-2 lg:p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
                     <Book className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -278,10 +278,10 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
           <button
             onClick={handleAddClick}
             disabled={isLoading}
-            className="w-full text-center py-12 lg:py-16 bg-gradient-to-br from-gray-50/50 to-blue-50/50 rounded-2xl border-2 border-dashed border-gray-300/50 hover:border-blue-300/50 transition-all duration-200 cursor-pointer backdrop-blur-sm group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full text-center py-12 lg:py-16 bg-white/50 backdrop-blur-md rounded-2xl border-2 border-dashed border-white/60 hover:border-blue-300/60 transition-all duration-300 cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
             aria-label="Add reading resources"
           >
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
               <Plus className="w-6 h-6 lg:w-8 lg:h-8 text-gray-400 group-hover:text-blue-600 transition-colors" />
             </div>
             <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">
@@ -295,29 +295,29 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
         )}
       </div>
 
-      {/* Custom Modal - Completely Independent */}
+      {/* Custom Modal */}
       {showAddModal && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           onClick={handleCancel}
         >
           <div
-            className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md border border-white/50 p-6"
+            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md border border-white/40 p-6 transition-all duration-300 hover:bg-white/90"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-xl">
+                <div className="p-2 bg-blue-100/80 rounded-xl backdrop-blur-sm border border-blue-200/50">
                   <Book className="w-5 h-5 text-blue-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   Add Reading Resource
                 </h2>
               </div>
               <button
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-gray-100/80 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -335,7 +335,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
                     value={newResource.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-gray-300/60 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 hover:bg-white/80 focus:bg-white/80"
                     placeholder="Enter resource title"
                     required
                     autoFocus
@@ -352,7 +352,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
                     value={newResource.url}
                     onChange={(e) => handleInputChange("url", e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-gray-300/60 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 hover:bg-white/80 focus:bg-white/80"
                     placeholder="https://example.com or example.com"
                     required
                     disabled={isLoading}
@@ -371,7 +371,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
                   type="button"
                   onClick={handleCancel}
                   disabled={isLoading}
-                  className="flex-1 px-4 py-3 border border-gray-300/50 text-gray-700 rounded-2xl hover:bg-gray-50/50 transition-colors backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 border border-gray-300/60 text-gray-700 rounded-2xl hover:bg-gray-50/80 transition-all duration-300 backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 >
                   Cancel
                 </button>
@@ -382,7 +382,7 @@ const ReadingResources: React.FC<ReadingResourcesProps> = ({
                     !isValidUrl(newResource.url) ||
                     isLoading
                   }
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 font-medium flex items-center justify-center"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 font-medium flex items-center justify-center hover:scale-105"
                 >
                   {isLoading ? (
                     <>

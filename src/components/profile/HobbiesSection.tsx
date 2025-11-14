@@ -25,16 +25,16 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
   
   const hasHobbies = hobbies && hobbies.length > 0;
 
-  // Color variants for hobby tags
+  // Enhanced color variants for hobby tags with glassmorphism
   const colorVariants = [
-    'bg-blue-100 text-blue-800 border-blue-200',
-    'bg-green-100 text-green-800 border-green-200',
-    'bg-purple-100 text-purple-800 border-purple-200',
-    'bg-yellow-100 text-yellow-800 border-yellow-200',
-    'bg-pink-100 text-pink-800 border-pink-200',
-    'bg-indigo-100 text-indigo-800 border-indigo-200',
-    'bg-red-100 text-red-800 border-red-200',
-    'bg-teal-100 text-teal-800 border-teal-200'
+    'bg-blue-100/80 text-blue-800 border-blue-200/60 backdrop-blur-sm',
+    'bg-green-100/80 text-green-800 border-green-200/60 backdrop-blur-sm',
+    'bg-purple-100/80 text-purple-800 border-purple-200/60 backdrop-blur-sm',
+    'bg-yellow-100/80 text-yellow-800 border-yellow-200/60 backdrop-blur-sm',
+    'bg-pink-100/80 text-pink-800 border-pink-200/60 backdrop-blur-sm',
+    'bg-indigo-100/80 text-indigo-800 border-indigo-200/60 backdrop-blur-sm',
+    'bg-red-100/80 text-red-800 border-red-200/60 backdrop-blur-sm',
+    'bg-teal-100/80 text-teal-800 border-teal-200/60 backdrop-blur-sm'
   ];
 
   const getColorVariant = (index: number) => {
@@ -247,15 +247,19 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-lg rounded-3xl border border-white/50 shadow-xl p-6 lg:p-8 mb-8">
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl p-6 lg:p-8 mb-8 transition-all duration-300 hover:bg-white/70">
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-pink-100/80 rounded-2xl backdrop-blur-sm">
+            <div className="p-3 bg-pink-100/80 rounded-2xl backdrop-blur-md border border-pink-200/50">
               <Heart className="w-5 h-5 lg:w-6 lg:h-6 text-pink-600" />
             </div>
             <div>
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Hobbies & Interests</h2>
-              <p className="text-gray-600 mt-1 text-sm lg:text-base">Personal interests and activities</p>
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Hobbies & Interests
+              </h2>
+              <p className="text-gray-600 mt-1 text-sm lg:text-base">
+                Personal interests and activities
+              </p>
             </div>
           </div>
           
@@ -263,7 +267,7 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
             <button
               onClick={handleAddClick}
               disabled={isLoading}
-              className="p-3 bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-3 bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
               aria-label="Add new hobby"
             >
               <Plus className="w-5 h-5" />
@@ -276,13 +280,13 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
             {displayHobbies.map((hobby, index) => (
               <div
                 key={index}
-                className={`group relative px-3 py-2 lg:px-4 lg:py-3 rounded-2xl border-2 font-medium transition-all duration-200 hover:scale-105 cursor-default text-sm lg:text-base ${getColorVariant(index)}`}
+                className={`group relative px-3 py-2 lg:px-4 lg:py-3 rounded-2xl border-2 font-medium transition-all duration-300 hover:scale-105 cursor-default text-sm lg:text-base backdrop-blur-sm shadow-lg hover:shadow-xl ${getColorVariant(index)}`}
               >
                 {hobby}
                 <button
                   onClick={() => handleDeleteHobby(hobby)}
                   disabled={isLoading}
-                  className="absolute -top-1 -right-1 lg:-top-2 lg:-right-2 p-1 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 disabled:opacity-50 shadow-md"
+                  className="absolute -top-1 -right-1 lg:-top-2 lg:-right-2 p-1 bg-white/90 backdrop-blur-md rounded-full hover:bg-red-50 transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100 disabled:opacity-50 shadow-md hover:scale-110 border border-white/60"
                   aria-label={`Delete ${hobby}`}
                 >
                   <Trash2 className="w-3 h-3 text-red-600" />
@@ -294,13 +298,15 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
           <button
             onClick={handleAddClick}
             disabled={isLoading}
-            className="w-full text-center py-12 lg:py-16 bg-gradient-to-br from-gray-50/50 to-pink-50/50 rounded-2xl border-2 border-dashed border-gray-300/50 hover:border-pink-300/50 transition-all duration-200 cursor-pointer backdrop-blur-sm group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full text-center py-12 lg:py-16 bg-white/50 backdrop-blur-md rounded-2xl border-2 border-dashed border-white/60 hover:border-pink-300/60 transition-all duration-300 cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
             aria-label="Add hobbies"
           >
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
               <Plus className="w-6 h-6 lg:w-8 lg:h-8 text-gray-400 group-hover:text-pink-600 transition-colors" />
             </div>
-            <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">Add Hobbies & Interests</h3>
+            <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">
+              Add Hobbies & Interests
+            </h3>
             <p className="text-gray-600 max-w-md mx-auto text-sm lg:text-base">
               Share your passions, activities, and things you enjoy doing.
             </p>
@@ -315,22 +321,22 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
           onClick={handleCancel}
         >
           <div 
-            className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-white/50 p-6"
+            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-white/40 p-6 transition-all duration-300 hover:bg-white/90"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-pink-100 rounded-xl">
+                <div className="p-2 bg-pink-100/80 rounded-xl backdrop-blur-sm border border-pink-200/50">
                   <Heart className="w-5 h-5 text-pink-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   Add Hobby
                 </h2>
               </div>
               <button
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-gray-100/80 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -348,7 +354,7 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
                     value={newHobby}
                     onChange={(e) => setNewHobby(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-gray-300/60 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white/60 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 hover:bg-white/80 focus:bg-white/80"
                     placeholder="Enter hobby name"
                     required
                     autoFocus
@@ -369,7 +375,7 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
                         type="button"
                         onClick={() => handleSuggestionClick(suggestion)}
                         disabled={isLoading}
-                        className="px-3 py-2 bg-gray-100/50 hover:bg-gray-200/50 rounded-xl text-sm transition-colors disabled:opacity-50 text-left"
+                        className="px-3 py-2 bg-white/60 backdrop-blur-sm hover:bg-white/80 rounded-xl text-sm transition-all duration-300 disabled:opacity-50 text-left hover:scale-105 border border-white/40"
                       >
                         {suggestion}
                       </button>
@@ -383,14 +389,14 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
                   type="button"
                   onClick={handleCancel}
                   disabled={isLoading}
-                  className="flex-1 px-4 py-3 border border-gray-300/50 text-gray-700 rounded-2xl hover:bg-gray-50/50 transition-colors backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 border border-gray-300/60 text-gray-700 rounded-2xl hover:bg-gray-50/80 transition-all duration-300 backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!newHobby.trim() || isLoading}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-pink-600 to-red-600 text-white rounded-2xl hover:from-pink-700 hover:to-red-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-pink-600 disabled:hover:to-red-600 font-medium flex items-center justify-center"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-pink-600 to-red-600 text-white rounded-2xl hover:from-pink-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-pink-600 disabled:hover:to-red-600 font-medium flex items-center justify-center hover:scale-105"
                 >
                   {isLoading ? (
                     <>
