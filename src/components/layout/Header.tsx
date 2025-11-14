@@ -56,36 +56,36 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   };
 
   const handleLogout = async (): Promise<void> => {
-    try {
-      const toastId = toast.loading("Logging out...");
-      const response = await api.post("/admin-auth/signin/logout");
-      
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userData");
-      
-      delete api.defaults.headers.common["Authorization"];
+  try {
+    const toastId = toast.loading("Logging out...");
+    const response = await api.post("/admin-auth/signin/logout");
+    
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData");
+    
+    delete api.defaults.headers.common["Authorization"];
 
-      setIsDropdownOpen(false);
+    setIsDropdownOpen(false);
 
-      toast.update(toastId, {
-        render: response.data?.message || "Logged out successfully!",
-        type: "success",
-        isLoading: false,
-        autoClose: 2000,
-      });
-      navigate("/login");
-    } catch {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userData");
-      delete api.defaults.headers.common["Authorization"];
+    toast.update(toastId, {
+      render: response.data?.message || "Logged out successfully!",
+      type: "success",
+      isLoading: false,
+      autoClose: 2000,
+    });
+    smartNavigate("/login");
+  } catch {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData");
+    delete api.defaults.headers.common["Authorization"];
 
-      setIsDropdownOpen(false);
-      toast.info("Logged out successfully!");
-      navigate("/login");
-    }
-  };
+    setIsDropdownOpen(false);
+    toast.info("Logged out successfully!");
+    smartNavigate("/login");
+  }
+};
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-gray-200 p-3 sm:p-4 shadow-sm z-40 transition-all duration-300">
