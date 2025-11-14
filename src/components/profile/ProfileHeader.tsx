@@ -1,28 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
-import {
-  Download,
-  Edit2,
-  Camera,
-  Plus,
-  X,
-  FileText,
-  Image as ImageIcon,
-  Book,
-} from "lucide-react";
-import { type UserProfile, type UpdateType } from "./index";
-import ReactDOM from "react-dom";
+import React, { useRef, useState } from "react";
+import { Download, Edit2, Camera, Plus, X, FileText, Image as ImageIcon } from "lucide-react";
+import { type UserProfile, type UpdateType, ALLOWED_IMAGE_TYPES, ALLOWED_DOC_TYPES, MAX_FILE_SIZE, getErrorMessage } from "./index";
 import api from "../../api/api";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-// Constants
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-const ALLOWED_DOC_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+import ReactDOM from "react-dom";
 
 // File Update Modal Component
 interface FileUpdateModalProps {
@@ -42,7 +23,7 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedFile) {
       setTimeout(() => setIsVisible(true), 10);
     } else {
@@ -167,142 +148,22 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
   return ReactDOM.createPortal(modalContent, document.body);
 };
 
-// Quote Update Modal Component
-interface QuoteUpdateModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentQuote: string;
-  onSubmit: (quote: string) => void;
-  isLoading: boolean;
-}
-
-const QuoteUpdateModal: React.FC<QuoteUpdateModalProps> = ({
-  isOpen,
-  onClose,
-  currentQuote,
-  onSubmit,
-  isLoading,
-}) => {
-  const [quote, setQuote] = useState(currentQuote || "");
-
-  useEffect(() => {
-    if (isOpen) setQuote(currentQuote || "");
-  }, [isOpen, currentQuote]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (quote.trim() && quote.length <= 200) {
-      onSubmit(quote.trim());
-    }
-  };
-
-  const handleCancel = () => {
-    if (!isLoading) {
-      onClose();
-      setQuote(currentQuote || "");
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md border border-white/50 p-6" onClick={(e) => e.stopPropagation()}>
-        
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <Book className="w-5 h-5 text-blue-600" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              {currentQuote ? "Update Quote" : "Add Quote"}
-            </h2>
-          </div>
-          <button
-            onClick={handleCancel}
-            disabled={isLoading}
-            className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Quote {quote.length > 0 && `(${quote.length}/200)`}
-              </label>
-              <textarea
-                value={quote}
-                onChange={(e) => setQuote(e.target.value)}
-                rows={4}
-                maxLength={200}
-                className="w-full px-4 py-3 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-colors resize-none disabled:opacity-50"
-                placeholder="Share an inspiring quote or thought..."
-                disabled={isLoading}
-                required
-              />
-              {quote.length >= 190 && (
-                <p className="text-red-500 text-xs mt-1">{200 - quote.length} characters remaining</p>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex space-x-3 mt-6 pt-6 border-t border-gray-200/50">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isLoading}
-              className="flex-1 px-4 py-3 border border-gray-300/50 text-gray-700 rounded-2xl hover:bg-gray-50/50 transition-colors backdrop-blur-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!quote.trim() || quote.length > 200 || isLoading}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 font-medium flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  {currentQuote ? "Updating..." : "Adding..."}
-                </>
-              ) : currentQuote ? (
-                "Update Quote"
-              ) : (
-                "Add Quote"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body
-  );
-};
-
-// Main Profile Header Component
 interface ProfileHeaderProps {
   userData: UserProfile;
-  onUpdate?: (type: UpdateType, data: any) => void;
+  onUpdate: (type: UpdateType, data: any) => void;
   onUserDataUpdate?: (updatedData: Partial<UserProfile>) => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  userData,
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
+  userData, 
   onUpdate,
-  onUserDataUpdate,
+  onUserDataUpdate 
 }) => {
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedFile, setSelectedFile] = useState<{ file: File; type: "banner" | "profile" | "resume" } | null>(null);
-  const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   // File upload configuration
@@ -312,7 +173,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     resume: { endpoint: "/admin/profile/resume", fieldName: "resume" }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "banner" | "profile" | "resume") => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "banner" | "profile" | "resume"): void => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -333,11 +194,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     event.target.value = ""; // Reset input
   };
 
-  const getErrorMessage = (error: any): string => {
-    if (typeof error === "string") return error;
-    return error?.response?.data?.message || error?.message || "An unexpected error occurred. Please try again.";
-  };
-
   const uploadFile = async (file: File, type: "banner" | "profile" | "resume"): Promise<string> => {
     const { endpoint, fieldName } = uploadConfig[type];
     const formData = new FormData();
@@ -348,8 +204,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     });
 
     if (response.data.user) {
-      const imageData = response.data.user[fieldName];
-      return (typeof imageData === "object" && imageData.url) ? imageData.url : imageData;
+      const fileData = response.data.user[fieldName];
+      return (typeof fileData === "object" && fileData.url) ? fileData.url : fileData;
     }
 
     throw new Error("Invalid response from server");
@@ -370,9 +226,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
          selectedFile.type === "profile" ? "profile_image" : "resume"]: fileUrl
       };
 
+      // Update parent component data directly without triggering modal
       if (typeof onUserDataUpdate === 'function') {
         onUserDataUpdate(updateData);
       } else {
+        // Fallback: update localStorage and let parent refresh
         const updatedUserData = { ...userData, ...updateData };
         localStorage.setItem('userData', JSON.stringify(updatedUserData));
       }
@@ -397,45 +255,51 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   };
 
-  const handleQuoteSubmit = async (quote: string): Promise<void> => {
-    setIsUploading(true);
-
-    try {
-      const response = await api.patch("/admin/profile/quote", { quote });
-      if (!response.data) throw new Error("Invalid response from server");
-
-      if (typeof onUserDataUpdate === 'function') {
-        onUserDataUpdate({ quote });
-      } else {
-        const updatedUserData = { ...userData, quote };
-        localStorage.setItem('userData', JSON.stringify(updatedUserData));
-      }
-
-      setShowQuoteModal(false);
-      toast.success(userData.quote ? "Quote updated successfully!" : "Quote added successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    } catch (error: any) {
-      console.error("Error updating quote:", error);
-      toast.error(`Failed to update quote: ${getErrorMessage(error)}`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } finally {
-      setIsUploading(false);
+  const handleCancelUpdate = (): void => {
+    if (!isUploading) {
+      setSelectedFile(null);
     }
   };
 
-  const handleCancelUpdate = () => !isUploading && setSelectedFile(null);
-
-  const handleReselectFile = (type: "banner" | "profile" | "resume") => {
+  const handleReselectFile = (type: "banner" | "profile" | "resume"): void => {
     if (isUploading) return;
     const refs = { banner: bannerInputRef, profile: profileInputRef, resume: resumeInputRef };
     refs[type].current?.click();
   };
 
-  const renderPlaceholder = (type: "banner" | "profile") => (
+  const handleQuoteUpdate = (): void => {
+    onUpdate('quote', { currentQuote: userData.quote || "" });
+  };
+
+  const handleResumeDownload = (): void => {
+    if (!userData.resume) return;
+
+    try {
+      // Create a meaningful filename using the user's name
+      const userName = userData.name || userData.user_name || 'user';
+      const cleanName = userName.replace(/\s+/g, '_').toLowerCase();
+      const fileName = `${cleanName}_resume.pdf`;
+      
+      // Create a temporary anchor element for download
+      const link = document.createElement('a');
+      link.href = userData.resume;
+      link.download = fileName;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading resume:', error);
+      // Fallback to opening in new tab if download fails
+      window.open(userData.resume, '_blank');
+    }
+  };
+
+  const handleResumeUpdate = (): void => {
+    resumeInputRef.current?.click();
+  };
+
+  const renderPlaceholder = (type: "banner" | "profile"): JSX.Element => (
     <div className={`w-full h-full bg-gradient-to-br from-gray-200/50 to-gray-300/50 flex items-center justify-center ${
       type === "profile" ? "rounded-2xl border-4 border-white/80" : ""
     }`}>
@@ -449,12 +313,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl overflow-hidden mb-8 transition-all duration-300 hover:bg-white/70">
       {/* Banner Section */}
-      <div className="relative h-48 bg-gradient-to-br from-blue-400/30 via-purple-500/30 to-pink-500/30 backdrop-blur-sm">
+      <div className="relative h-55 bg-gradient-to-br from-blue-400/30 via-purple-500/30 to-pink-500/30 backdrop-blur-sm">
         {userData.banner_image ? (
           <img 
             src={userData.banner_image} 
             alt="Banner" 
-            className="w-full h-full object-cover mix-blend-overlay" 
+            className="w-full h-full object-fit mix-blend-overlay" 
           />
         ) : (
           renderPlaceholder("banner")
@@ -542,7 +406,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     </p>
                   </div>
                   <button
-                    onClick={() => setShowQuoteModal(true)}
+                    onClick={handleQuoteUpdate}
                     disabled={isUploading}
                     className="p-2 hover:bg-gray-100/80 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-start hover:scale-105"
                     aria-label="Edit quote"
@@ -553,14 +417,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               ) : (
                 <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
                   <button
-                    onClick={() => setShowQuoteModal(true)}
+                    onClick={handleQuoteUpdate}
                     disabled={isUploading}
                     className="text-gray-500 text-base lg:text-lg italic border-l-4 border-gray-300 pl-4 py-3 bg-gray-50/50 rounded-r-xl backdrop-blur-sm hover:bg-gray-100/60 transition-colors cursor-pointer break-words flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform transition-transform"
                   >
                     "Add a quote about yourself..."
                   </button>
                   <button
-                    onClick={() => setShowQuoteModal(true)}
+                    onClick={handleQuoteUpdate}
                     disabled={isUploading}
                     className="p-2 hover:bg-gray-100/80 rounded-lg transition-colors cursor-pointer flex-shrink-0 backdrop-blur-sm border border-gray-200/50 disabled:opacity-50 disabled:cursor-not-allowed mt-3 sm:mt-0 self-start hover:scale-105"
                     aria-label="Add quote"
@@ -583,14 +447,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             />
 
             {userData.resume ? (
-              <button
-                onClick={() => window.open(userData.resume, "_blank")}
-                disabled={isUploading}
-                className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
-              >
-                <Download className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                <span className="font-semibold text-base whitespace-nowrap">Resume</span>
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={handleResumeDownload}
+                  disabled={isUploading}
+                  className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
+                >
+                  <Download className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <span className="font-semibold text-base whitespace-nowrap">Resume</span>
+                </button>
+                
+                {/* Update Resume Button - Small overlay button */}
+                <button
+                  onClick={handleResumeUpdate}
+                  disabled={isUploading}
+                  className="absolute -top-2 -right-2 bg-white/90 backdrop-blur-md hover:bg-white text-gray-700 p-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group border border-white/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
+                  aria-label="Update resume"
+                >
+                  <Edit2 className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
             ) : (
               <button
                 onClick={() => resumeInputRef.current?.click()}
@@ -605,21 +481,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
 
-      {/* Modals */}
+      {/* File Update Modal */}
       <FileUpdateModal
         selectedFile={selectedFile}
         onConfirm={handleConfirmUpdate}
         onCancel={handleCancelUpdate}
         onReselect={handleReselectFile}
         isUploading={isUploading}
-      />
-
-      <QuoteUpdateModal
-        isOpen={showQuoteModal}
-        onClose={() => setShowQuoteModal(false)}
-        currentQuote={userData.quote || ""}
-        onSubmit={handleQuoteSubmit}
-        isLoading={isUploading}
       />
     </div>
   );
