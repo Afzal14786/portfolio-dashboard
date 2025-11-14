@@ -48,7 +48,14 @@ const Header: React.FC = () => {
     try {
       const toastId = toast.loading("Logging out...");
       const response = await api.post("/admin-auth/signin/logout");
-      localStorage.clear();
+      
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+      
+      delete api.defaults.headers.common["Authorization"];
+
+      setIsDropdownOpen(false);
 
       toast.update(toastId, {
         render: response.data?.message || "Logged out successfully!",
@@ -58,7 +65,12 @@ const Header: React.FC = () => {
       });
       navigate("/login");
     } catch {
-      localStorage.clear();
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+      delete api.defaults.headers.common["Authorization"];
+
+      setIsDropdownOpen(false);
       toast.info("Logged out successfully!");
       navigate("/login");
     }

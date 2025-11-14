@@ -172,16 +172,27 @@ const OtpVerification: React.FC = () => {
         toast.success(config.successMessage);
 
         if (type === "login" && response.data.data?.accessToken) {
+          // Store both tokens from backend response
           localStorage.setItem("accessToken", response.data.data.accessToken);
-          localStorage.setItem(
-            "userData",
-            JSON.stringify(response.data.data.user)
-          );
+          localStorage.setItem("refreshToken", response.data.data.refreshToken);
+
+          // Store user data
+          if (response.data.data.user) {
+            localStorage.setItem(
+              "userData",
+              JSON.stringify(response.data.data.user)
+            );
+          }
+
+          // Set axios default authorization header
           api.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.data.accessToken}`;
 
-          navigate(config.redirectTo);
+          // Navigate after a brief delay to ensure token is stored
+          setTimeout(() => {
+            navigate(config.redirectTo);
+          }, 100);
         } else if (
           type === "reset-password" &&
           response.data.data?.resetToken

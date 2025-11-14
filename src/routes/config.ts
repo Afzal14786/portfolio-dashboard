@@ -5,6 +5,7 @@ import OtpVerification from '../components/OtpVerification';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 import NotFound from '../pages/NotFound/NotFound';
+import Profile from '../pages/Profile/ProfilePage';
 
 export interface RouteConfig {
   path: string;
@@ -28,6 +29,7 @@ export const routes: RouteConfig[] = [
   
   // Protected routes
   { path: '/dashboard', component: DashboardPage, requireAuth: true },
+  { path: '/profile', component: Profile, requireAuth: true },
   
   // Default route
   { path: '/', component: RedirectToDashboard, requireAuth: true },
