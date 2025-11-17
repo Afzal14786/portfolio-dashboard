@@ -53,6 +53,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Form submitted, preventDefault called");
 
     // Basic validation
     if (!formData.email || !formData.password) {
@@ -142,7 +143,7 @@ const Login: React.FC = () => {
             Please enter your login details below.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {/* Email */}
             <div>
               <label
@@ -157,7 +158,6 @@ const Login: React.FC = () => {
                   id="email"
                   name="email"
                   type="email"
-                  required
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
@@ -180,7 +180,6 @@ const Login: React.FC = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  required
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"

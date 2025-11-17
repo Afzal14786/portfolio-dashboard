@@ -10,6 +10,10 @@ import BlogsPage from '../pages/Blogs/BlogsPage';
 import ProjectsPage from '../pages/Project/ProjectPage';
 import CertificatesPage from '../pages/Certificates/CertificatePage';
 import SkillsPage from '../pages/Skills/SkillsPage';
+import HelpPage from '../pages/help/HelpPage';
+import AccountSetting from '../pages/settings/AccountSetting';
+
+import {ROUTES} from "../utils/navigation";
 
 export interface RouteConfig {
   path: string;
@@ -17,11 +21,6 @@ export interface RouteConfig {
   requireAuth: boolean;
 }
 
-// Create a redirect component
-const RedirectToDashboard = () => {
-  window.location.href = '/dashboard';
-  return null;
-};
 
 export const routes: RouteConfig[] = [
   // Public routes
@@ -32,15 +31,17 @@ export const routes: RouteConfig[] = [
   { path: '/reset-password', component: ResetPassword, requireAuth: false },
   
   // Protected routes (with layout)
-  { path: '/dashboard', component: DashboardPage, requireAuth: true },
-  { path: '/profile', component: Profile, requireAuth: true },
-  { path: '/blogs', component: BlogsPage, requireAuth: true },
-  { path: '/projects', component: ProjectsPage, requireAuth: true },
-  { path: '/certificates', component: CertificatesPage, requireAuth: true },
-  { path: '/skills', component: SkillsPage, requireAuth: true },
+  { path: ROUTES.DASHBOARD, component: DashboardPage, requireAuth: true },
+  { path: ROUTES.PROFILE, component: Profile, requireAuth: true },
+  { path: ROUTES.BLOGS, component: BlogsPage, requireAuth: true },
+  { path: ROUTES.PROJECTS, component: ProjectsPage, requireAuth: true },
+  { path: ROUTES.CERTIFICATES, component: CertificatesPage, requireAuth: true },
+  { path: ROUTES.SKILLS, component: SkillsPage, requireAuth: true },
+  { path: ROUTES.SETTINGS, component: AccountSetting, requireAuth: true },
+  { path: ROUTES.HELP, component: HelpPage, requireAuth: true },
   
   // Default route
-  { path: '/', component: RedirectToDashboard, requireAuth: true },
+  { path: ROUTES.DASHBOARD, component: DashboardPage, requireAuth: true },
   
   // 404 route
   { path: '*', component: NotFound, requireAuth: false },
