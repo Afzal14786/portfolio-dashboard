@@ -124,7 +124,7 @@ const Register: React.FC = () => {
       const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
         ? err.response.data.message
         : "Registration failed. Please check your network.";
-      
+
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
