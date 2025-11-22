@@ -31,6 +31,7 @@ export const routes: RouteConfig[] = [
   { path: '/reset-password', component: ResetPassword, requireAuth: false },
   
   // Protected routes (with layout)
+  { path: '/', component: DashboardPage, requireAuth: true },
   { path: ROUTES.DASHBOARD, component: DashboardPage, requireAuth: true },
   { path: ROUTES.PROFILE, component: Profile, requireAuth: true },
   { path: ROUTES.BLOGS, component: BlogsPage, requireAuth: true },
@@ -39,10 +40,7 @@ export const routes: RouteConfig[] = [
   { path: ROUTES.SKILLS, component: SkillsPage, requireAuth: true },
   { path: ROUTES.SETTINGS, component: AccountSetting, requireAuth: true },
   { path: ROUTES.HELP, component: HelpPage, requireAuth: true },
-  
-  // Default route
-  { path: ROUTES.DASHBOARD, component: DashboardPage, requireAuth: true },
-  
+    
   // 404 route
-  { path: '*', component: NotFound, requireAuth: false },
+  { path: '*', component: NotFound, requireAuth: true },
 ];

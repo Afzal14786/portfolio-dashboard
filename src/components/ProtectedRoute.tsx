@@ -1,22 +1,23 @@
 import { Navigate } from 'react-router-dom';
+import {useAuth} from "../hooks/useAuth"
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireAuth?: boolean; // true for routes that need auth, false for public routes that should be hidden when logged in
+  requireAuth?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   requireAuth = false 
 }) => {
-  const isAuthenticated = localStorage.getItem('accessToken');
+  const { isAuthenticated, isLoading } = useAuth();
   
-  // If route requires authentication but user is not logged in
+  if (isLoading) return <div>Loading...</div>;
+  
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
-  // If route is public (login/register) but user is already logged in
   if (!requireAuth && isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }

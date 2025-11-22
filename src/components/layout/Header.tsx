@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const handleLogout = async (): Promise<void> => {
   try {
     const toastId = toast.loading("Logging out...");
-    const response = await api.post("/admin-auth/signin/logout");
+    const response = await api.post("/admin/auth/signin/logout");
     
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");

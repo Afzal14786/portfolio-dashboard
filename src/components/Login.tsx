@@ -64,7 +64,7 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await api.post("/admin-auth/signin/login", formData);
+      const res = await api.post("/admin/auth/signin", formData);
 
       if (res.data.success) {
         toast.success(res.data.message || "OTP sent to your email!");
