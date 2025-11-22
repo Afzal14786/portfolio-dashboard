@@ -42,7 +42,7 @@ const HobbiesSection: React.FC<HobbiesSectionProps> = ({ hobbies, onUpdate }) =>
       // Create updated hobbies array without the deleted hobby
       const updatedHobbies = hobbies.filter(hobby => hobby !== hobbyToDelete);
 
-      const response = await api.patch('/admin/profile/hobbies', {
+      const response = await api.patch('/admin/profile/update/hobbies', {
         hobbies: updatedHobbies
       });
       

@@ -1,50 +1,96 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+} from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 
-const data = [
-  { day: 'Mon', visitors: 400 },
-  { day: 'Tue', visitors: 300 },
-  { day: 'Wed', visitors: 500 },
-  { day: 'Thu', visitors: 400 },
-  { day: 'Fri', visitors: 600 },
-  { day: 'Sat', visitors: 800 },
-  { day: 'Sun', visitors: 700 },
-];
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
-const VisitorChart: React.FC = () => {
+interface VisitorChartProps {
+  data: Array<{ name: string; value: number; color: string }>;
+}
+
+const VisitorChart: React.FC<VisitorChartProps> = ({ data }) => {
+  const hasData = data.some(item => item.value > 0);
+
+  const chartData = {
+    labels: data.map(item => item.name),
+    datasets: [
+      {
+        data: data.map(item => item.value),
+        backgroundColor: data.map(item => item.color),
+        borderColor: data.map(item => item.color),
+        borderWidth: 2,
+        hoverOffset: 15,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle',
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
+      },
+    },
+    cutout: '70%',
+  };
+
+  if (!hasData) {
+    return (
+      <div className="h-64 flex flex-col items-center justify-center text-gray-500">
+        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <span className="text-2xl">📊</span>
+        </div>
+        <p className="text-lg font-semibold mb-2">No Engagement Data</p>
+        <p className="text-sm text-gray-400">Start getting likes, comments, and shares to see analytics</p>
+      </div>
+    );
+  }
+
+  // Calculate total for center text
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis 
-            dataKey="day" 
-            stroke="#6b7280"
-            fontSize={12}
-          />
-          <YAxis 
-            stroke="#6b7280"
-            fontSize={12}
-          />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'white', 
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              color: '#374151',
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-            }}
-          />
-          <Line 
-            type="monotone" 
-            dataKey="visitors" 
-            stroke="#2563eb" 
-            strokeWidth={2}
-            dot={{ fill: '#2563eb', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, fill: '#2563eb' }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+    <div className="h-64 relative">
+      <Doughnut data={chartData} options={options} />
+      {/* Center text */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <div className="text-2xl font-bold text-gray-900">{total}</div>
+        <div className="text-sm text-gray-500">Total</div>
+      </div>
     </div>
   );
 };

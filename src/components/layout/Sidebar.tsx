@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-    { icon: FileText, label: 'Blogs', href: '/blogs' },
+    { icon: FileText, label: 'Blogs', href: '/admin/blogs' },
     { icon: Briefcase, label: 'Projects', href: '/projects' },
     { icon: Award, label: 'Certificates', href: '/certificates' },
     { icon: Cpu, label: 'Skills', href: '/skills' },

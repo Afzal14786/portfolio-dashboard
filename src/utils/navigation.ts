@@ -31,7 +31,8 @@ export const useNavigation = () => {
 export const ROUTES = {
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
-  BLOGS: '/blogs',
+  BLOGS: '/admin/blogs',
+  BLOG_READING: '/admin/blogs/read/:slug',
   PROJECTS: '/projects',
   CERTIFICATES: '/certificates',
   SKILLS: '/skills',

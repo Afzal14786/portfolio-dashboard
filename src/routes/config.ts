@@ -12,6 +12,7 @@ import CertificatesPage from '../pages/Certificates/CertificatePage';
 import SkillsPage from '../pages/Skills/SkillsPage';
 import HelpPage from '../pages/help/HelpPage';
 import AccountSetting from '../pages/settings/AccountSetting';
+import BlogReading from '../components/blog/BlogReading';
 
 import {ROUTES} from "../utils/navigation";
 
@@ -35,6 +36,7 @@ export const routes: RouteConfig[] = [
   { path: ROUTES.DASHBOARD, component: DashboardPage, requireAuth: true },
   { path: ROUTES.PROFILE, component: Profile, requireAuth: true },
   { path: ROUTES.BLOGS, component: BlogsPage, requireAuth: true },
+  { path: `${ROUTES.BLOGS}/read/:slug`, component: BlogReading, requireAuth: true },
   { path: ROUTES.PROJECTS, component: ProjectsPage, requireAuth: true },
   { path: ROUTES.CERTIFICATES, component: CertificatesPage, requireAuth: true },
   { path: ROUTES.SKILLS, component: SkillsPage, requireAuth: true },

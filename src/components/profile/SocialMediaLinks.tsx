@@ -70,7 +70,7 @@ const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({ socialMedia, onUpda
       const updatedSocialMedia = { ...socialMedia };
       delete updatedSocialMedia[platform];
 
-      const response = await api.patch('/admin/profile/social-media', {
+      const response = await api.patch('/admin/profile/update/social-media', {
         socialMedia: updatedSocialMedia
       });
 

@@ -1,6 +1,21 @@
 import React, { useRef, useState } from "react";
-import { Download, Edit2, Camera, Plus, X, FileText, Image as ImageIcon } from "lucide-react";
-import { type UserProfile, type UpdateType, ALLOWED_IMAGE_TYPES, ALLOWED_DOC_TYPES, MAX_FILE_SIZE, getErrorMessage } from "./index";
+import {
+  Download,
+  Edit2,
+  Camera,
+  Plus,
+  X,
+  FileText,
+  Image as ImageIcon,
+} from "lucide-react";
+import {
+  type UserProfile,
+  type UpdateType,
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_DOC_TYPES,
+  MAX_FILE_SIZE,
+  getErrorMessage,
+} from "./index";
 import api from "../../api/api";
 import { toast } from "react-toastify";
 import ReactDOM from "react-dom";
@@ -37,30 +52,40 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
     banner: {
       title: "Update Banner Image",
       icon: <ImageIcon className="w-5 h-5" />,
-      text: "banner image"
+      text: "banner image",
     },
     profile: {
       title: "Update Profile Image",
       icon: <ImageIcon className="w-5 h-5" />,
-      text: "profile image"
+      text: "profile image",
     },
     resume: {
       title: "Update Resume",
       icon: <FileText className="w-5 h-5" />,
-      text: "resume file"
-    }
+      text: "resume file",
+    },
   };
 
   const config = modalConfig[selectedFile.type];
 
   const modalContent = (
-    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-300 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-md" onClick={onCancel} />
-      
-      <div className={`relative bg-white/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 ${
-        isVisible ? "scale-100 opacity-100 translate-y-0" : "scale-95 opacity-0 translate-y-4"
-      } border border-white/50`}>
-        
+    <div
+      className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-300 ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div
+        className="absolute inset-0 bg-black/30 backdrop-blur-md"
+        onClick={onCancel}
+      />
+
+      <div
+        className={`relative bg-white/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 ${
+          isVisible
+            ? "scale-100 opacity-100 translate-y-0"
+            : "scale-95 opacity-0 translate-y-4"
+        } border border-white/50`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
           <div className="flex items-center space-x-3">
@@ -68,8 +93,12 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
               {config.icon}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">{config.title}</h2>
-              <p className="text-sm text-gray-600 mt-0.5">Upload your {config.text}</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {config.title}
+              </h2>
+              <p className="text-sm text-gray-600 mt-0.5">
+                Upload your {config.text}
+              </p>
             </div>
           </div>
           <button
@@ -98,7 +127,9 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
                       {(selectedFile.file.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                     <span className="text-xs text-gray-600">•</span>
-                    <span className="text-xs text-gray-600 capitalize">{selectedFile.type}</span>
+                    <span className="text-xs text-gray-600 capitalize">
+                      {selectedFile.type}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -110,7 +141,9 @@ const FileUpdateModal: React.FC<FileUpdateModalProps> = ({
               className="w-full py-2.5 bg-white/50 border border-gray-300/50 rounded-lg hover:bg-gray-100/50 transition-all duration-200 flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Edit2 className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Choose Different File</span>
+              <span className="text-sm font-medium text-gray-700">
+                Choose Different File
+              </span>
             </button>
           </div>
 
@@ -154,33 +187,58 @@ interface ProfileHeaderProps {
   onUserDataUpdate?: (updatedData: Partial<UserProfile>) => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
-  userData, 
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  userData,
   onUpdate,
-  onUserDataUpdate 
+  onUserDataUpdate,
 }) => {
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
-  const [selectedFile, setSelectedFile] = useState<{ file: File; type: "banner" | "profile" | "resume" } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{
+    file: File;
+    type: "banner" | "profile" | "resume";
+  } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   // File upload configuration
   const uploadConfig = {
-    banner: { endpoint: "/admin/profile/banner", fieldName: "banner_image" },
-    profile: { endpoint: "/admin/profile/image", fieldName: "profile_image" },
-    resume: { endpoint: "/admin/profile/resume", fieldName: "resume" }
+    banner: {
+      endpoint: "/admin/profile/update/banner",
+      fieldName: "banner_image", // Matches backend: upload.single("banner_image")
+      userField: "banner_image",
+    },
+    profile: {
+      endpoint: "/admin/profile/update/image",
+      fieldName: "profile_image", // Matches backend: upload.single("profile_image")
+      userField: "profile_image",
+    },
+    resume: {
+      endpoint: "/admin/profile/update/resume",
+      fieldName: "resume", // Matches backend: upload.single("resume")
+      userField: "resume",
+    },
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "banner" | "profile" | "resume"): void => {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "banner" | "profile" | "resume"
+  ): void => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validate file type
-    const allowedTypes = type === "resume" ? ALLOWED_DOC_TYPES : ALLOWED_IMAGE_TYPES;
+    const allowedTypes =
+      type === "resume" ? ALLOWED_DOC_TYPES : ALLOWED_IMAGE_TYPES;
     if (!allowedTypes.includes(file.type)) {
-      toast.error(`Only ${type === "resume" ? "PDF and Word documents" : "JPEG, JPG, PNG & WebP images"} are allowed`);
+      toast.error(
+        `Only ${
+          type === "resume"
+            ? "PDF and Word documents"
+            : "JPEG, JPG, PNG & WebP images"
+        } are allowed`
+      );
       return;
     }
 
@@ -194,18 +252,33 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     event.target.value = ""; // Reset input
   };
 
-  const uploadFile = async (file: File, type: "banner" | "profile" | "resume"): Promise<string> => {
-    const { endpoint, fieldName } = uploadConfig[type];
+  const uploadFile = async (
+    file: File,
+    type: "banner" | "profile" | "resume"
+  ): Promise<string> => {
+    const { endpoint, fieldName, userField } = uploadConfig[type];
+
     const formData = new FormData();
-    formData.append(fieldName, file);
+    formData.append(fieldName, file); // Use the correct field name
+
+    console.log("📤 Uploading file:", {
+      type,
+      fieldName,
+      fileName: file.name,
+      endpoint,
+    });
 
     const response = await api.patch(endpoint, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
+    console.log("📥 Upload response:", response.data);
+
     if (response.data.user) {
-      const fileData = response.data.user[fieldName];
-      return (typeof fileData === "object" && fileData.url) ? fileData.url : fileData;
+      const fileData = response.data.user[userField];
+      return typeof fileData === "object" && fileData.url
+        ? fileData.url
+        : fileData;
     }
 
     throw new Error("Invalid response from server");
@@ -222,22 +295,27 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       if (!fileUrl) throw new Error("No URL returned from server");
 
       const updateData: Partial<UserProfile> = {
-        [selectedFile.type === "banner" ? "banner_image" : 
-         selectedFile.type === "profile" ? "profile_image" : "resume"]: fileUrl
+        [selectedFile.type === "banner"
+          ? "banner_image"
+          : selectedFile.type === "profile"
+          ? "profile_image"
+          : "resume"]: fileUrl,
       };
 
       // Update parent component data directly without triggering modal
-      if (typeof onUserDataUpdate === 'function') {
+      if (typeof onUserDataUpdate === "function") {
         onUserDataUpdate(updateData);
       } else {
         // Fallback: update localStorage and let parent refresh
         const updatedUserData = { ...userData, ...updateData };
-        localStorage.setItem('userData', JSON.stringify(updatedUserData));
+        localStorage.setItem("userData", JSON.stringify(updatedUserData));
       }
 
       setSelectedFile(null);
       toast.update(toastId, {
-        render: `${selectedFile.type.charAt(0).toUpperCase() + selectedFile.type.slice(1)} updated successfully!`,
+        render: `${
+          selectedFile.type.charAt(0).toUpperCase() + selectedFile.type.slice(1)
+        } updated successfully!`,
         type: "success",
         isLoading: false,
         autoClose: 3000,
@@ -245,7 +323,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     } catch (error: any) {
       console.error("Upload failed:", error);
       toast.update(toastId, {
-        render: `Failed to upload ${selectedFile.type}: ${getErrorMessage(error)}`,
+        render: `Failed to upload ${selectedFile.type}: ${getErrorMessage(
+          error
+        )}`,
         type: "error",
         isLoading: false,
         autoClose: 5000,
@@ -263,12 +343,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const handleReselectFile = (type: "banner" | "profile" | "resume"): void => {
     if (isUploading) return;
-    const refs = { banner: bannerInputRef, profile: profileInputRef, resume: resumeInputRef };
+    const refs = {
+      banner: bannerInputRef,
+      profile: profileInputRef,
+      resume: resumeInputRef,
+    };
     refs[type].current?.click();
   };
 
   const handleQuoteUpdate = (): void => {
-    onUpdate('quote', { currentQuote: userData.quote || "" });
+    onUpdate("quote", { currentQuote: userData.quote || "" });
   };
 
   const handleResumeDownload = (): void => {
@@ -276,22 +360,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
     try {
       // Create a meaningful filename using the user's name
-      const userName = userData.name || userData.user_name || 'user';
-      const cleanName = userName.replace(/\s+/g, '_').toLowerCase();
+      const userName = userData.name || userData.user_name || "user";
+      const cleanName = userName.replace(/\s+/g, "_").toLowerCase();
       const fileName = `${cleanName}_resume.pdf`;
-      
+
       // Create a temporary anchor element for download
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = userData.resume;
       link.download = fileName;
-      link.target = '_blank';
+      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Error downloading resume:', error);
+      console.error("Error downloading resume:", error);
       // Fallback to opening in new tab if download fails
-      window.open(userData.resume, '_blank');
+      window.open(userData.resume, "_blank");
     }
   };
 
@@ -300,11 +384,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   const renderPlaceholder = (type: "banner" | "profile"): JSX.Element => (
-    <div className={`w-full h-full bg-gradient-to-br from-gray-200/50 to-gray-300/50 flex items-center justify-center ${
-      type === "profile" ? "rounded-2xl border-4 border-white/80" : ""
-    }`}>
+    <div
+      className={`w-full h-full bg-gradient-to-br from-gray-200/50 to-gray-300/50 flex items-center justify-center ${
+        type === "profile" ? "rounded-2xl border-4 border-white/80" : ""
+      }`}
+    >
       <div className="text-center text-gray-500">
-        <ImageIcon className={`${type === "banner" ? "w-16 h-16" : "w-20 h-20 lg:w-24 lg:h-24"} mx-auto mb-2 opacity-60`} />
+        <ImageIcon
+          className={`${
+            type === "banner" ? "w-16 h-16" : "w-20 h-20 lg:w-24 lg:h-24"
+          } mx-auto mb-2 opacity-60`}
+        />
         <p className="text-sm">No {type} image</p>
       </div>
     </div>
@@ -315,10 +405,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Banner Section */}
       <div className="relative h-55 bg-gradient-to-br from-blue-400/30 via-purple-500/30 to-pink-500/30 backdrop-blur-sm">
         {userData.banner_image ? (
-          <img 
-            src={userData.banner_image} 
-            alt="Banner" 
-            className="w-full h-full object-fit mix-blend-overlay" 
+          <img
+            src={userData.banner_image}
+            alt="Banner"
+            className="w-full h-full object-fit mix-blend-overlay"
           />
         ) : (
           renderPlaceholder("banner")
@@ -454,9 +544,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
                 >
                   <Download className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  <span className="font-semibold text-base whitespace-nowrap">Resume</span>
+                  <span className="font-semibold text-base whitespace-nowrap">
+                    Resume
+                  </span>
                 </button>
-                
+
                 {/* Update Resume Button - Small overlay button */}
                 <button
                   onClick={handleResumeUpdate}
@@ -474,7 +566,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-md hover:bg-white/95 text-gray-700 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer group border border-white/60 hover:border-gray-300/60 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transform"
               >
                 <Plus className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                <span className="font-semibold text-base whitespace-nowrap">Add Resume</span>
+                <span className="font-semibold text-base whitespace-nowrap">
+                  Add Resume
+                </span>
               </button>
             )}
           </div>

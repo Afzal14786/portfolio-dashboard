@@ -82,7 +82,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
             return;
           }
 
-          response = await api.patch("/admin/profile/quote", { 
+          response = await api.patch("/admin/profile/update/quote", { 
             quote: formData.quote 
           });
           
@@ -110,7 +110,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
           const updatedReadingResources = [...currentResources, newResource];
 
           // Send the complete array to backend as required
-          response = await api.patch("/admin/profile/reading-resources", {
+          response = await api.patch("/admin/profile/update/reading-resources", {
             readingResources: updatedReadingResources
           });
 
@@ -131,7 +131,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
             [formData.platform]: formattedUrl
           };
 
-          response = await api.patch('/admin/profile/social-media', {
+          response = await api.patch('/admin/profile/update/social-media', {
             socialMedia: updatedSocialMedia
           });
 
@@ -150,7 +150,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
             : [];
           const updatedHobbies = [...currentHobbies, formData.name.trim()];
           
-          response = await api.patch('/admin/profile/hobbies', {
+          response = await api.patch('/admin/profile/update/hobbies', {
             hobbies: updatedHobbies
           });
 
