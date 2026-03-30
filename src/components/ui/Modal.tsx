@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -16,6 +16,20 @@ const Modal: React.FC<ModalProps> = ({
   children, 
   size = 'md' 
 }) => {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -26,19 +40,24 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div 
-        className={`bg-white rounded-2xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden animate-in fade-in-90 zoom-in-90 duration-300`}
+        className={`bg-white rounded-2xl shadow-2xl w-full ${sizeClasses[size]} flex flex-col max-h-[90vh] animate-in fade-in-90 zoom-in-95 duration-200 border border-gray-200`}
       >
         {/* Header */}
         {(title || onClose) && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-5 sm:px-6 border-b border-gray-100 flex-shrink-0">
             {title && (
-              <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h2>
             )}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all cursor-pointer outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -46,8 +65,8 @@ const Modal: React.FC<ModalProps> = ({
           </div>
         )}
         
-        {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1 p-5 sm:p-6">
           {children}
         </div>
       </div>

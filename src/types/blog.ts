@@ -1,50 +1,19 @@
+import type { User } from "./user";
+
 export interface Blog {
   _id: string;
   title: string;
   slug: string;
   content: string;
   excerpt: string;
-  author: string;
-  coverImage?: {  // Make optional
-    url: string;
-    cloudinaryId: string;
-    alt: string;
-    caption: string;
-  };
-  images: Array<{
-    cloudinaryId: string;
-    url: string;
-    alt: string;
-    caption: string;
-    position: number;
-    uploadedAt: string;
-  }>;
-  codeBlocks: Array<{
-    id: string;
-    language: string;
-    code: string;
-    lineCount: number;
-    showLineNumbers: boolean;
-    position: number;
-    createdAt: string;
-  }>;
-  readTime: string;
-  wordCount: number;
-  topic: string;
+  coverImage: string;
   tags: string[];
-  status: 'draft' | 'scheduled' | 'published' | 'archived';
-  publishedAt: string | null;
-  scheduledFor: string | null;
-  views?: number;  // Make optional
-  likes: string[];
-  likesCount?: number;  // Make optional
-  commentsCount?: number;  // Make optional
-  shares?: number;  // Make optional
-  metaTitle: string;
-  metaDescription: string;
-  canonicalUrl: string;
-  version: number;
-  lastEditedBy: string;
+  status: 'Draft' | 'Published';
+  views: number;
+  likesCount: number;
+  commentsCount: number;
+  // Use Pick to extract exactly what the populated backend sends
+  author: Pick<User, '_id' | 'name' | 'profileImage'> | string; 
   createdAt: string;
   updatedAt: string;
 }

@@ -1,7 +1,12 @@
 export interface ApiError {
-  status?: number;
   message: string;
-  errors?: Record<string, string[]>; // Optional validation errors
+  status?: number;
+  errors?: Record<string, string[]>;
 }
 
-
+// Add this generic wrapper for all successful API calls
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  [key: string]: any;
+}

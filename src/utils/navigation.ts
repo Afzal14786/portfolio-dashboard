@@ -36,6 +36,8 @@ export const ROUTES = {
   PROJECTS: '/projects',
   CERTIFICATES: '/certificates',
   SKILLS: '/skills',
+  JOURNEY: '/journey',
+  ANALYTICS: '/analytics',
   SETTINGS: '/settings',
   HELP: '/help',
 } as const;

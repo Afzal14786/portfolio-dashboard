@@ -1,80 +1,52 @@
-import React from 'react';
-import { Eye, Heart, MessageCircle, TrendingUp, ArrowUp } from 'lucide-react';
-import { type Blog } from '../../types/blog';
+import type { TrendingBlog } from '../../types/analytics';
+import { Eye, Heart, MessageSquare } from 'lucide-react';
 
 interface TrendingBlogsProps {
-  blogs: Blog[];
+  blogs: TrendingBlog[];
 }
 
-const TrendingBlogs: React.FC<TrendingBlogsProps> = ({ blogs }) => {
-  const formatNumber = (num: number): string => {
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'k';
-    }
-    return num.toString();
-  };
-
-  if (!blogs || blogs.length === 0) {
-    return null;
+export default function TrendingBlogs({ blogs }: TrendingBlogsProps) {
+  if (blogs.length === 0) {
+    return <div className="p-8 text-center text-gray-500">Not enough data to show trending blogs yet.</div>;
   }
 
-  // Sort by views and take top 5
-  const trendingBlogs = blogs
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 5);
-
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-          <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-          Trending Blogs
-        </h3>
-        <span className="text-sm text-gray-500">By views</span>
-      </div>
-
-      <div className="space-y-4">
-        {trendingBlogs.map((blog, index) => (
-          <div key={blog._id} className="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors group">
-            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              {index + 1}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                {blog.title}
-              </h4>
-              <p className="text-sm text-gray-500 truncate">{blog.topic}</p>
-            </div>
-            
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <div className="flex items-center space-x-1" title="Views">
-                <Eye size={14} />
-                <span className="font-medium">{formatNumber(blog.views || 0)}</span>
-              </div>
-              <div className="flex items-center space-x-1" title="Likes">
-                <Heart size={14} />
-                <span className="font-medium">{formatNumber(blog.likesCount || 0)}</span>
-              </div>
-              <div className="flex items-center space-x-1" title="Comments">
-                <MessageCircle size={14} />
-                <span className="font-medium">{formatNumber(blog.commentsCount || 0)}</span>
-              </div>
-            </div>
-
-            {index === 0 && (
-              <div className="flex-shrink-0">
-                <div className="flex items-center space-x-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                  <ArrowUp size={12} />
-                  <span>Top</span>
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500 font-semibold">
+            <th className="p-4 pl-6">Blog Title</th>
+            <th className="p-4 text-center">Views</th>
+            <th className="p-4 text-center">Likes</th>
+            <th className="p-4 text-center pr-6">Comments</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {blogs.map((blog) => (
+            <tr key={blog._id} className="hover:bg-gray-50 transition-colors group">
+              <td className="p-4 pl-6">
+                <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{blog.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{new Date(blog.createdAt).toLocaleDateString()}</p>
+              </td>
+              <td className="p-4 text-center">
+                <div className="flex items-center justify-center text-gray-700 font-medium">
+                  <Eye className="w-4 h-4 mr-1.5 text-gray-400" /> {blog.views}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              </td>
+              <td className="p-4 text-center">
+                <div className="flex items-center justify-center text-gray-700 font-medium">
+                  <Heart className="w-4 h-4 mr-1.5 text-red-400" /> {blog.likesCount}
+                </div>
+              </td>
+              <td className="p-4 text-center pr-6">
+                <div className="flex items-center justify-center text-gray-700 font-medium">
+                  <MessageSquare className="w-4 h-4 mr-1.5 text-blue-400" /> {blog.commentsCount}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-export default TrendingBlogs;
+}

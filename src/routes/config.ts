@@ -13,6 +13,8 @@ import SkillsPage from '../pages/Skills/SkillsPage';
 import HelpPage from '../pages/help/HelpPage';
 import AccountSetting from '../pages/settings/AccountSetting';
 import BlogReading from '../components/blog/BlogReading';
+import JourneyPage from '../pages/Journey/JourneyPage';
+import AnalyticsPage from '../pages/Dashboard/AnalyticsPage';
 
 import {ROUTES} from "../utils/navigation";
 
@@ -39,7 +41,9 @@ export const routes: RouteConfig[] = [
   { path: `${ROUTES.BLOGS}/read/:slug`, component: BlogReading, requireAuth: true },
   { path: ROUTES.PROJECTS, component: ProjectsPage, requireAuth: true },
   { path: ROUTES.CERTIFICATES, component: CertificatesPage, requireAuth: true },
+  {path: ROUTES.JOURNEY, component: JourneyPage, requireAuth: true},
   { path: ROUTES.SKILLS, component: SkillsPage, requireAuth: true },
+  { path: ROUTES.ANALYTICS, component: AnalyticsPage, requireAuth: true },
   { path: ROUTES.SETTINGS, component: AccountSetting, requireAuth: true },
   { path: ROUTES.HELP, component: HelpPage, requireAuth: true },
     
