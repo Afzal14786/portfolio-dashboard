@@ -12,7 +12,7 @@ interface SkillModalProps {
 }
 
 interface ApiErrorResponse {
-  response?: { data?: { message?: string; }; };
+  response?: { data?: { message?: string; error?: string }; };
   message?: string;
 }
 
@@ -27,9 +27,10 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
 
   useEffect(() => {
     if (skill) {
-      setTitle(skill.title);
-      setTags(skill.tags?.join(', ') || '');
-      setImagePreview(skill.skill_icon || null);
+      setTitle(skill.title || '');
+      setTags(Array.isArray(skill.tags) ? skill.tags.join(', ') : '');
+      setImagePreview(skill.icon || null);
+      setImage(null);
     } else {
       setTitle('');
       setTags('');
@@ -39,18 +40,30 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
     }
   }, [skill, isOpen]);
 
-  useEffect(() => {
-    if (image) {
-      const objectUrl = URL.createObjectURL(image);
-      setImagePreview(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Icon size must be less than 2MB");
+      return;
     }
-  }, [image]);
+    if (!file.type.startsWith('image/')) {
+      setError("Please upload a valid image file");
+      return;
+    }
+
+    setError('');
+    setImage(file);
+    const objectUrl = URL.createObjectURL(file);
+    setImagePreview(objectUrl);
+    
+    return () => URL.revokeObjectURL(objectUrl);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Validate image only if creating a new skill
     if (!skill && !image) {
       setError("Please upload a skill icon");
       return;
@@ -66,7 +79,9 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
       const tagsArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
       formData.append('tags', JSON.stringify(tagsArray));
       
-      if (image) formData.append('icon', image);
+      if (image) {
+        formData.append('icon', image);
+      }
 
       if (skill && skill._id) {
         await portfolioService.updateSkill(skill._id, formData);
@@ -78,7 +93,12 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
       onClose();
     } catch (err: unknown) {
       const apiError = err as ApiErrorResponse;
-      setError(apiError.response?.data?.message || apiError.message || 'Error saving skill.');
+      setError(
+        apiError.response?.data?.message || 
+        apiError.response?.data?.error || 
+        apiError.message || 
+        'Error saving skill.'
+      );
     } finally {
       setLoading(false);
     }
@@ -116,17 +136,17 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Skill Icon (SVG/PNG) {(!skill || !skill.skill_icon) && <span className="text-red-500">*</span>}
+            Skill Icon (SVG/PNG) {(!skill || !skill.icon) && <span className="text-red-500">*</span>}
           </label>
           <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-center cursor-pointer overflow-hidden group">
             <input 
-              type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} 
+              type="file" accept="image/*" onChange={handleImageChange} 
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
             />
             {imagePreview ? (
               <>
-                <img src={imagePreview} alt="Preview" className="max-w-full max-h-full object-contain p-4" />
-                <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[80px] object-contain p-2" />
+                <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-[1px]">
                   <span className="text-white font-medium flex items-center text-sm"><UploadCloud className="mr-2 w-4 h-4" /> Change</span>
                 </div>
               </>
@@ -139,16 +159,16 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
           </div>
         </div>
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-2">
+        <div className="sticky bottom-0 -mx-5 sm:-mx-6 -mb-5 sm:-mb-6 px-5 sm:px-6 py-4 bg-white/95 backdrop-blur-md border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end gap-3 rounded-b-2xl z-30 mt-2">
           <button 
             type="button" onClick={onClose} 
-            className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 outline-none transition-colors"
+            className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 outline-none transition-colors"
           >
             Cancel
           </button>
           <button 
             type="submit" disabled={loading} 
-            className="px-6 py-2.5 text-sm font-semibold bg-blue-600 text-white rounded-xl flex items-center shadow-sm hover:bg-blue-700 disabled:opacity-70 transition-colors"
+            className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-sm hover:bg-blue-700 disabled:opacity-70 transition-colors"
           >
             {loading ? <><Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" /> Saving...</> : (skill ? 'Update Skill' : 'Save Skill')}
           </button>

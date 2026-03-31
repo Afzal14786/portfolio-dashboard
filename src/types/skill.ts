@@ -1,7 +1,7 @@
 export interface Skill {
   _id: string;
   title: string;
-  skill_icon: string; 
+  icon: string; 
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
