@@ -11,20 +11,10 @@ export const blogService = {
   // Read Operations
   getAllBlogs: () => api.get('/admin/blogs'),
   getBlogsByStatus: (status: string) => api.get(`/admin/blogs/status/${status}`),
-  
-  // Fixed: Use admin endpoint for blog reading (since you don't want public routes)
   getBlogBySlug: (slug: string) => api.get(`/admin/blogs/read/${slug}`),
-  
-  // Get published blogs for reading
-  getPublishedBlogs: (params?: {
-    page?: number;
-    limit?: number;
-    topic?: string;
-    search?: string;
-  }) => {
+  getPublishedBlogs: (params?: { page?: number; limit?: number; topic?: string; search?: string; }) => {
     return api.get('/admin/blogs/read', { params });
   },
-  
   getUserBlogs: () => api.get('/admin/blogs'),
   getBlogById: (id: string) => api.get(`/admin/blogs/${id}`),
 
@@ -35,11 +25,15 @@ export const blogService = {
     api.patch(`/admin/blogs/${id}/status`, { status }),
 
   // Delete Operations
-  deleteBlog: (id: string) => api.delete(`/admin/blogs/${id}`),
+  deleteBlog: (id: string, hardDelete: boolean = false) => 
+    api.delete(`/admin/blogs/${id}`, { data: { hardDelete } }),
 
   // Content Operations
-  uploadImage: (formData: FormData) => 
-    api.post('/admin/blogs/upload-image', formData, {
+  // FIX: Provide a fallback URL if no blog ID is present (for cover images before saving)
+  uploadImage: (formData: FormData, blogId?: string) => {
+    const url = blogId ? `/admin/blogs/${blogId}/images` : '/admin/blogs/upload-image';
+    return api.post(url, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
-    }),
+    });
+  }
 };

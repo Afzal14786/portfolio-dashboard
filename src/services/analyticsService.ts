@@ -1,33 +1,26 @@
 import api from '../api/api';
-import type { 
-  DashboardStatsResponse, 
-  BlogAnalyticsResponse, 
-  BlogsByStatusResponse,
-  DashboardStats,
-  TrendingBlog,
-  VisitorData,
-  BlogStatusMetrics
-} from '../types/analytics';
+import type { DashboardStats, BlogAnalytics } from '../types/analytics';
+import type { Blog, BlogUpdateData } from '../types/blog';
 
 export const analyticsService = {
-  
   getDashboardStats: async (): Promise<DashboardStats> => {
-    const response = await api.get<DashboardStatsResponse>('/analytics/dashboard-status');
-    if (!response.data.stats) throw new Error('Failed to load dashboard stats');
-    return response.data.stats;
+    const response = await api.get('/admin/blogs/stats');
+    return response.data;
   },
 
-  getBlogAnalytics: async (): Promise<{ trending: TrendingBlog[]; visitorData: VisitorData[] }> => {
-    const response = await api.get<BlogAnalyticsResponse>('/analytics/blog-analytics');
-    return {
-      trending: response.data.trending || [],
-      visitorData: response.data.visitorData || []
-    };
+  getBlogsByStatus: async (status: string): Promise<Blog[]> => {
+    const response = await api.get(`/admin/blogs/status/${status}`);
+    return response.data;
   },
 
-  getBlogsByStatus: async (): Promise<BlogStatusMetrics[]> => {
-    const response = await api.get<BlogsByStatusResponse>('/analytics/blogs-by-status');
-    return response.data.data || [];
-  }
+  getBlogAnalytics: async (id: string): Promise<BlogAnalytics> => {
+    const response = await api.get(`/admin/blogs/analytics/${id}`);
+    if (response.data && response.data.data) {
+        return response.data.data;
+    }
+    return response.data;
+  },
 
+  updateBlog: (id: string, data: Partial<BlogUpdateData>) => api.put(`/admin/blogs/${id}`, data),
+  deleteBlog: (id: string) => api.delete(`/admin/blogs/${id}`),
 };

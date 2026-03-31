@@ -6,16 +6,17 @@ export interface Blog {
   slug: string;
   content: string;
   excerpt: string;
-  coverImage: string;
+  topic?: string;
+  coverImage: string | { url: string; alt?: string; caption?: string; public_id?: string };
   tags: string[];
-  status: 'Draft' | 'Published';
+  status: 'Draft' | 'Published' | 'Scheduled';
   views: number;
   likesCount: number;
   commentsCount: number;
-  // Use Pick to extract exactly what the populated backend sends
   author: Pick<User, '_id' | 'name' | 'profileImage'> | string; 
   createdAt: string;
   updatedAt: string;
+  scheduledFor?: string;
 }
 
 export interface BlogCreateData {
@@ -55,6 +56,12 @@ export interface DashboardStats {
   trending: Blog[];
 }
 
+export interface InteractionRecord {
+  _id: string;
+  user: string;
+  createdAt: string;
+}
+
 export interface BlogAnalytics {
   blog: Blog;
   analytics: {
@@ -67,8 +74,8 @@ export interface BlogAnalytics {
     }>;
   };
   breakdown: {
-    likes: any[];
-    comments: any[];
-    shares: any[];
+    likes: InteractionRecord[];
+    comments: InteractionRecord[];
+    shares: InteractionRecord[];
   };
 }

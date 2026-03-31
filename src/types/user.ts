@@ -20,6 +20,13 @@ export interface CloudinaryImage {
   url: string;
 }
 
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  profileImage?: string;
+}
+
 export interface UserProfile {
   _id: string;
   name: string;

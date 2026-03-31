@@ -1,29 +1,34 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Heart, MessageCircle, Share, Edit, Trash2, BarChart, Calendar, Clock } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Edit, Trash2, BarChart, Calendar } from 'lucide-react';
 import { type Blog } from '../../types/blog';
+
+type ExtendedBlog = Blog & {
+  readTime?: string;
+  publishedAt?: string;
+};
 
 interface BlogCardProps {
   blog: Blog;
   onEdit: (blog: Blog) => void;
   onDelete: (blog: Blog) => void;
   onViewAnalytics: (blog: Blog) => void;
+  viewMode?: 'grid' | 'list'; 
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnalytics }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnalytics, viewMode = 'grid' }) => {
   const navigate = useNavigate();
+  const extendedBlog = blog as ExtendedBlog;
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return 'Not published';
     return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric'
     });
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'published': return 'bg-green-100 text-green-800';
       case 'draft': return 'bg-gray-100 text-gray-800';
       case 'scheduled': return 'bg-blue-100 text-blue-800';
@@ -33,28 +38,35 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnaly
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only navigate if the click wasn't on an action button
     if (!(e.target as HTMLElement).closest('.action-button')) {
-      // Use the correct path with /read
       navigate(`/admin/blogs/read/${blog.slug}`);
     }
   };
 
+  const getImageUrl = (coverImage: Blog['coverImage']) => {
+    if (!coverImage) return undefined;
+    if (typeof coverImage === 'string') return coverImage;
+    return coverImage.url;
+  };
+
+  const imageUrl = getImageUrl(blog.coverImage);
+  const isList = viewMode === 'list';
+
   return (
     <div 
-      className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer"
+      className={`bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group flex ${isList ? 'flex-col sm:flex-row min-h-[14rem]' : 'flex-col h-full'}`}
       onClick={handleCardClick}
     >
       {/* Cover Image */}
-      {blog.coverImage?.url && (
-        <div className="relative h-48 overflow-hidden">
+      {imageUrl && (
+        <div className={`relative overflow-hidden flex-shrink-0 bg-gray-100 ${isList ? 'w-full sm:w-72 h-48 sm:h-auto' : 'w-full h-48'}`}>
           <img 
-            src={blog.coverImage.url} 
-            alt={blog.coverImage.alt || blog.title}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            src={imageUrl} 
+            alt={blog.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute top-3 right-3">
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(blog.status)}`}>
+            <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm ${getStatusColor(blog.status)}`}>
               {blog.status.charAt(0).toUpperCase() + blog.status.slice(1)}
             </span>
           </div>
@@ -62,108 +74,73 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnaly
       )}
       
       {/* Content */}
-      <div className="p-4 sm:p-6">
-        {/* Topic */}
+      <div className="p-5 flex flex-col flex-grow">
+        
+        {/* Topic & Views */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
-            {blog.topic}
+          <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
+            {blog.topic || 'Uncategorized'}
           </span>
-          <div className="flex items-center space-x-1 text-gray-500 text-sm">
+          <div className="flex items-center space-x-1.5 text-gray-400 text-sm font-medium">
             <Eye size={14} />
             <span>{blog.views || 0}</span>
           </div>
         </div>
         
         {/* Title */}
-        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-2 leading-tight hover:text-blue-600 transition-colors">
+        <h3 className={`font-bold text-xl text-gray-900 mb-2 leading-tight group-hover:text-blue-600 transition-colors ${isList ? 'line-clamp-2' : 'line-clamp-2'}`}>
           {blog.title}
         </h3>
         
-        {/* Excerpt */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
-          {blog.excerpt || 'No excerpt available'}
+        {/* Excerpt - Allowed to grow in list mode */}
+        <p className={`text-gray-500 text-sm mb-4 leading-relaxed flex-grow ${isList ? 'line-clamp-3' : 'line-clamp-2'}`}>
+          {blog.excerpt || 'No excerpt available for this blog post.'}
         </p>
         
-        {/* Meta Information */}
-        <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-          <div className="flex items-center space-x-1">
-            <Clock size={12} />
-            <span>{blog.readTime}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Calendar size={12} />
-            <span>{formatDate(blog.publishedAt)}</span>
-          </div>
-        </div>
-        
-        {/* Tags */}
-        {blog.tags && blog.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
-            {blog.tags.slice(0, 3).map((tag, index) => (
-              <span 
-                key={index}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
-              >
-                #{tag}
-              </span>
-            ))}
-            {blog.tags.length > 3 && (
-              <span className="px-2 py-1 text-xs text-gray-400 rounded-full">
-                +{blog.tags.length - 3} more
-              </span>
+        {/* Meta & Actions Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-100 mt-auto gap-3 sm:gap-0">
+          
+          <div className="flex items-center space-x-4 text-xs font-medium text-gray-400">
+            <div className="flex items-center space-x-1.5">
+              <Calendar size={14} />
+              <span>{formatDate(extendedBlog.publishedAt || blog.createdAt)}</span>
+            </div>
+            {!isList && (
+              <>
+                <div className="flex items-center space-x-1.5 hover:text-red-500 transition-colors">
+                  <Heart size={16} />
+                  <span className="font-bold">{blog.likesCount || 0}</span>
+                </div>
+                <div className="flex items-center space-x-1.5 hover:text-blue-500 transition-colors">
+                  <MessageCircle size={16} />
+                  <span className="font-bold">{blog.commentsCount || 0}</span>
+                </div>
+              </>
             )}
-          </div>
-        )}
-        
-        {/* Engagement Stats and Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          {/* Engagement Stats */}
-          <div className="flex items-center space-x-4 text-gray-500 text-sm">
-            <div className="flex items-center space-x-1">
-              <Heart size={16} className="text-red-500" />
-              <span className="font-medium">{blog.likesCount || 0}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <MessageCircle size={16} className="text-blue-500" />
-              <span className="font-medium">{blog.commentsCount || 0}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Share size={16} className="text-green-500" />
-              <span className="font-medium">{blog.shares || 0}</span>
-            </div>
           </div>
           
           {/* Action Buttons */}
-          <div className="flex items-center space-x-2 action-button">
+          <div className="flex items-center space-x-1 action-button self-end sm:self-auto">
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewAnalytics(blog);
-              }}
-              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); onViewAnalytics(blog); }}
+              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200 cursor-pointer"
               title="View Analytics"
             >
-              <BarChart size={16} />
+              <BarChart size={18} />
             </button>
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(blog);
-              }}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); onEdit(blog); }}
+              className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 cursor-pointer"
               title="Edit Blog"
             >
-              <Edit size={16} />
+              <Edit size={18} />
             </button>
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(blog);
-              }}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); onDelete(blog); }}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 cursor-pointer"
               title="Delete Blog"
             >
-              <Trash2 size={16} />
+              <Trash2 size={18} />
             </button>
           </div>
         </div>
