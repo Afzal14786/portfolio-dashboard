@@ -25,10 +25,19 @@ interface ApiErrorResponse {
 interface UploadResponse {
   data?: {
     url?: string;
+    cloudinaryId?: string;
+    public_id?: string;
     data?: {
       url?: string;
+      cloudinaryId?: string;
+      public_id?: string;
     };
   };
+}
+
+// Extend payload locally to include images array
+interface ExtendedPayload extends BlogCreateData {
+  images?: Array<{ url: string; cloudinaryId: string; alt: string; caption: string; position: number }>;
 }
 
 const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
@@ -56,7 +65,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     "Data Science", "Blockchain", "UI/UX Design", "Career",
   ];
 
-  // FIX: Fetch full blog details including content
   useEffect(() => {
     let isMounted = true;
 
@@ -65,18 +73,16 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
       
       try {
         setInitialDataLoading(true);
-        // Fetch the entire blog object to get the heavy text content
         const response = await blogService.getBlogById(blog._id);
         
         if (!isMounted) return;
 
-        // Safely extract from different potential Axios wrapper formats
         const fullBlog = response.data?.data?.blog || response.data?.data || response.data?.blog || response.data;
         const safeBlog = fullBlog as unknown as { metaTitle?: string; metaDescription?: string; scheduledFor?: string };
         
         setFormData({
           title: fullBlog.title || "",
-          content: fullBlog.content || "", // Populating content here fixes the 400 error!
+          content: fullBlog.content || "", 
           topic: fullBlog.topic || "Technology",
           tags: fullBlog.tags || [],
           status: fullBlog.status?.toLowerCase() || "draft",
@@ -105,7 +111,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     };
 
     if (blog) {
-      // 1. Optimistically set the basic data we already have from the grid/list
       const safeInitialBlog = blog as unknown as { metaTitle?: string; metaDescription?: string; scheduledFor?: string };
       setFormData(prev => ({
         ...prev,
@@ -118,7 +123,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
         scheduledFor: safeInitialBlog.scheduledFor || undefined,
       }));
       
-      // 2. Fetch the missing 'content' via ID
       loadFullBlogDetails();
     }
     
@@ -154,6 +158,27 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     }
   };
 
+  // Helper to extract Cloudinary IDs from the HTML content to forcefully fix DB errors
+  const extractImagesFromHTML = (html: string) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    const imgTags = Array.from(tempDiv.querySelectorAll("img"));
+    
+    return imgTags.map((img, index) => {
+      const url = img.src;
+      // Extract Cloudinary ID or fallback to a unique string
+      const cloudinaryId = url.split('/').pop()?.split('.')[0] || `inline_img_${Date.now()}_${index}`;
+      
+      return {
+        url,
+        cloudinaryId,
+        alt: img.alt || formData.title,
+        caption: "",
+        position: index
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -162,43 +187,45 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     try {
       if (formData.metaTitle && formData.metaTitle.length > 60) {
         setError('Meta title must be 60 characters or less');
-        setLoading(false);
-        return;
+        setLoading(false); return;
       }
       if (formData.metaDescription && formData.metaDescription.length > 160) {
         setError('Meta description must be 160 characters or less');
-        setLoading(false);
-        return;
+        setLoading(false); return;
       }
       
-      // Ensure content is not empty before submitting
       if (!formData.content || formData.content.trim() === '<p><br></p>' || formData.content.trim() === '') {
         setError("Blog content is required.");
-        setLoading(false);
-        return;
+        setLoading(false); return;
       }
 
       let coverImageUrl = imagePreview;
+      let coverImageCloudinaryId = "";
 
-      // 1. Upload Image
+      // 1. Upload Cover Image
       if (coverImageFile) {
         const imageFormData = new FormData();
         imageFormData.append("image", coverImageFile);
         
         try {
           const uploadResponse = await blogService.uploadImage(imageFormData, blog?._id) as UploadResponse;
-          coverImageUrl = uploadResponse.data?.data?.url || uploadResponse.data?.url || "";
+          const resData = uploadResponse.data?.data || uploadResponse.data;
+          
+          coverImageUrl = resData?.url || "";
+          coverImageCloudinaryId = resData?.cloudinaryId || resData?.public_id || coverImageUrl.split('/').pop()?.split('.')[0] || "";
           
         } catch (err: unknown) {
           const uploadError = err as ApiErrorResponse;
           setError(uploadError.response?.data?.error || "Failed to upload cover image");
-          setLoading(false);
-          return;
+          setLoading(false); return;
         }
+      } else if (imagePreview) {
+        // If reusing an old image, try to extract its cloudinary ID
+        coverImageCloudinaryId = imagePreview.split('/').pop()?.split('.')[0] || `cover_${Date.now()}`;
       }
 
-      // 2. Prepare Payload
-      const payload: BlogCreateData = {
+      // 2. Prepare Payload including extracted valid images
+      const payload: ExtendedPayload = {
         title: formData.title,
         content: formData.content,
         topic: formData.topic,
@@ -207,6 +234,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
         metaTitle: formData.metaTitle,
         metaDescription: formData.metaDescription,
         scheduledFor: scheduledDate ? new Date(scheduledDate).toISOString() : undefined,
+        images: extractImagesFromHTML(formData.content) // 🔥 Overwrites corrupted DB images
       };
 
       if (coverImageUrl && !coverImageUrl.startsWith('data:')) {
@@ -214,7 +242,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
               url: coverImageUrl,
               alt: formData.title,
               caption: "",
-              cloudinaryId: ""
+              cloudinaryId: coverImageCloudinaryId
           };
       }
 
@@ -409,9 +437,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
                 placeholder="Recommended: 50-60 characters"
                 maxLength={60}
               />
-              <div className={`text-xs mt-1.5 font-medium text-right ${(formData.metaTitle?.length || 0) > 55 ? 'text-orange-500' : 'text-gray-400'}`}>
-                {formData.metaTitle?.length || 0}/60
-              </div>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Meta Description</label>
@@ -423,9 +448,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
                 placeholder="Summarize the blog post (150-160 characters)"
                 maxLength={160}
               />
-              <div className={`text-xs mt-1.5 font-medium text-right ${(formData.metaDescription?.length || 0) > 150 ? 'text-orange-500' : 'text-gray-400'}`}>
-                {formData.metaDescription?.length || 0}/160
-              </div>
             </div>
           </div>
 

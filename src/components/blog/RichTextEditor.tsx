@@ -25,14 +25,15 @@ interface RichTextEditorProps {
   height?: number;
 }
 
-// Strictly type the backend response
 interface UploadResponse {
-  data: {
+  data?: {
     success?: boolean;
     data?: {
       url: string;
+      cloudinaryId?: string;
     };
     url?: string;
+    cloudinaryId?: string;
   };
 }
 
@@ -50,7 +51,7 @@ const RichTextEditor = ({
         heading: { levels: [2, 3] },
         bulletList: { keepMarks: true, keepAttributes: false },
         orderedList: { keepMarks: true, keepAttributes: false },
-        codeBlock: false, // Handled by standalone extension for better control
+        codeBlock: false, 
       }),
       CodeBlock.configure({
         HTMLAttributes: {
@@ -103,9 +104,9 @@ const RichTextEditor = ({
           const formData = new FormData();
           formData.append('image', file);
           
-          // Using the interface instead of any
           const response = await blogService.uploadImage(formData) as unknown as UploadResponse;
-          const imageUrl = response.data?.data?.url || response.data?.url;
+          const resData = response.data?.data || response.data;
+          const imageUrl = resData?.url;
 
           if (imageUrl && editor) {
             editor.chain().focus().setImage({ src: imageUrl, alt: file.name }).run();

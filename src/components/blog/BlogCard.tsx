@@ -6,6 +6,7 @@ import { type Blog } from '../../types/blog';
 type ExtendedBlog = Blog & {
   readTime?: string;
   publishedAt?: string;
+  category?: string;
 };
 
 interface BlogCardProps {
@@ -51,6 +52,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnaly
 
   const imageUrl = getImageUrl(blog.coverImage);
   const isList = viewMode === 'list';
+  
+  const displayTopic = blog.topic || extendedBlog.category;
 
   return (
     <div 
@@ -79,7 +82,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onViewAnaly
         {/* Topic & Views */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
-            {blog.topic || 'Uncategorized'}
+            {displayTopic}
           </span>
           <div className="flex items-center space-x-1.5 text-gray-400 text-sm font-medium">
             <Eye size={14} />

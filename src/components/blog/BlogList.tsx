@@ -10,7 +10,7 @@ interface BlogListProps {
   onDelete: (blog: Blog) => void;
   onViewAnalytics: (blog: Blog) => void;
   loading?: boolean;
-  viewMode?: 'grid' | 'list'; // Added viewMode prop
+  viewMode?: 'grid' | 'list'; 
 }
 
 const BlogList: React.FC<BlogListProps> = ({ 
