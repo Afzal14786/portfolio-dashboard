@@ -17,13 +17,11 @@ export default function AnalyticsPage() {
         setLoading(true);
         setError(null);
         
-        const [blogData, statusData] = await Promise.all([
-          analyticsService.getBlogAnalytics(),
-          analyticsService.getBlogsByStatus()
-        ]);
+        const data = await analyticsService.getAnalyticsOverview();
         
-        setTrending(blogData.trending || []);
-        setStatusMetrics(statusData || []);
+        setTrending(data.trending);
+        setStatusMetrics(data.metrics);
+        
       } catch (err: unknown) {
         setError('Failed to load detailed analytics. Ensure the backend is running.');
         console.error(err);
@@ -80,7 +78,6 @@ export default function AnalyticsPage() {
         )}
       </div>
 
-      {/* Status Breakdown (Visualizing getBlogsByStatus) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {statusMetrics.map((metric, index) => (
           <div key={index} className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex items-center justify-between">
@@ -96,7 +93,6 @@ export default function AnalyticsPage() {
           </div>
         ))}
       </div>
-
     </div>
   );
 }

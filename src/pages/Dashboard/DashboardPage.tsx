@@ -30,7 +30,6 @@ export default function DashboardPage() {
 
   if (loading) return <div className="min-h-[500px] flex items-center justify-center"><LoadingSpinner /></div>;
 
-  // Fallback for empty data
   const safeStats: DashboardStats = stats || {
     totalBlogs: 0, totalViews: 0, totalProjects: 0, totalSkills: 0,
     totalCertificates: 0, totalComments: 0, totalLikes: 0, publishedBlogs: 0, draftBlogs: 0
