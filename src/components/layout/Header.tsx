@@ -4,13 +4,8 @@ import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/api";
 import { useSmartNavigation } from "../../hooks/useSmartNavigation";
-
-interface UserData {
-  name: string;
-  user_name?: string;
-  email: string;
-  avatar?: string;
-}
+import { profileService } from "../../services/profileService";
+import type { UserProfile } from "../../types/user";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -19,25 +14,39 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const location = useLocation();
   const smartNavigate = useSmartNavigation();
-  const [userData, setUserData] = useState<UserData | null>(null);
+  
+  const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get user from localStorage
+  // 1. Fetch real user data from backend on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("userData");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser) as UserData;
-        setUserData(parsedUser);
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-        localStorage.removeItem("userData");
+    const fetchUserData = async () => {
+      // First, load from cache for instant UI rendering
+      const storedUser = localStorage.getItem("userData");
+      if (storedUser) {
+        try {
+          setUserData(JSON.parse(storedUser));
+        } catch (error) {
+          console.error("Error parsing cached user data:", error);
+        }
       }
-    }
+
+      // Then, fetch fresh data from the backend
+      try {
+        const liveProfile = await profileService.getProfile();
+        setUserData(liveProfile);
+        // Cache the fresh data
+        localStorage.setItem("userData", JSON.stringify(liveProfile));
+      } catch (error) {
+        console.error("Failed to fetch live profile data:", error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
-  // Close dropdown when clicking outside
+  // 2. Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -56,36 +65,55 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   };
 
   const handleLogout = async (): Promise<void> => {
-  try {
-    const toastId = toast.loading("Logging out...");
-    const response = await api.post("/admin/auth/signin/logout");
+    try {
+      const toastId = toast.loading("Logging out...");
+      const response = await api.post("/admin/auth/signin/logout");
+      
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+      
+      delete api.defaults.headers.common["Authorization"];
+
+      setIsDropdownOpen(false);
+
+      toast.update(toastId, {
+        render: response.data?.message || "Logged out successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
+      smartNavigate("/login");
+    } catch {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+      delete api.defaults.headers.common["Authorization"];
+
+      setIsDropdownOpen(false);
+      toast.info("Logged out successfully!");
+      smartNavigate("/login");
+    }
+  };
+
+  // 3. Helper to safely extract the image URL based on your JSON structure
+  const getAvatarUrl = (user: UserProfile | null) => {
+    if (!user || !user.profile_image) return "/images/user_icon.png"; // Fallback
     
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userData");
+    // If it's the object from your backend: { public_id: "...", url: "..." }
+    if (typeof user.profile_image === 'object' && user.profile_image.url) {
+      return user.profile_image.url;
+    }
     
-    delete api.defaults.headers.common["Authorization"];
+    // If it was saved as a direct string
+    if (typeof user.profile_image === 'string') {
+      return user.profile_image;
+    }
 
-    setIsDropdownOpen(false);
+    return "/images/user_icon.png";
+  };
 
-    toast.update(toastId, {
-      render: response.data?.message || "Logged out successfully!",
-      type: "success",
-      isLoading: false,
-      autoClose: 2000,
-    });
-    smartNavigate("/login");
-  } catch {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userData");
-    delete api.defaults.headers.common["Authorization"];
-
-    setIsDropdownOpen(false);
-    toast.info("Logged out successfully!");
-    smartNavigate("/login");
-  }
-};
+  const avatarUrl = getAvatarUrl(userData);
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-gray-200 p-3 sm:p-4 shadow-sm z-40 transition-all duration-300">
@@ -103,7 +131,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
 
         {/* Right Section - Notification & Profile */}
         <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Notification Icon */}
           <button 
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Notifications"
@@ -120,7 +147,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               aria-expanded={isDropdownOpen}
             >
               <img
-                src={userData?.avatar || "/images/user_icon.png"}
+                src={avatarUrl}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -134,16 +161,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
                   <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <img
-                        src={userData?.avatar || "/images/user_icon.png"}
+                        src={avatarUrl}
                         alt="avatar"
                         className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border border-gray-200 object-cover"
                       />
                       <div className="truncate flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 text-sm sm:text-base md:text-lg truncate">
-                          {userData?.name || "User Name"}
+                        {/* 4. Using exact keys from your JSON response: name and email */}
+                        <div className="font-semibold text-gray-900 text-sm sm:text-base md:text-lg truncate" title={userData?.name}>
+                          {userData?.name || "Loading..."}
                         </div>
-                        <div className="text-xs sm:text-sm text-gray-500 truncate">
-                          {userData?.email || "user@example.com"}
+                        <div className="text-xs sm:text-sm text-gray-500 truncate" title={userData?.email}>
+                          {userData?.email || "loading@example.com"}
                         </div>
                       </div>
                     </div>
@@ -171,7 +199,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
                     disabled={location.pathname === '/help'}
                   />
                   
-                  {/* Divider */}
                   <div className="border-t border-gray-100 my-1"></div>
                   
                   <MenuItem
@@ -209,13 +236,9 @@ const MenuItem: React.FC<{
     }`}
   >
     <div className="flex items-center space-x-2 sm:space-x-3">
-      <div className="flex-shrink-0">
-        {icon}
-      </div>
+      <div className="flex-shrink-0">{icon}</div>
       <span className="font-medium truncate">{label}</span>
-      {disabled && (
-        <span className="text-xs text-gray-400">(current)</span>
-      )}
+      {disabled && <span className="text-xs text-gray-400">(current)</span>}
     </div>
   </button>
 );
