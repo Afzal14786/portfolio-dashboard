@@ -11,26 +11,24 @@ export interface EmailUpdateResponse extends StandardResponse {
 }
 
 export const accountService = {
-  updatePassword: async (data: Record<string, string>): Promise<StandardResponse> => {
-    const response = await api.put<StandardResponse>('/admin/password/update', {
-      oldPassword: data.currentPassword,
-      newPassword: data.newPassword
-    });
-    return response.data;
-  },
 
   requestEmailUpdate: async (newEmail: string): Promise<EmailUpdateResponse> => {
-    const response = await api.post<EmailUpdateResponse>('/admin/email/update-request', {
-      newEmail
-    });
+    const response = await api.post<EmailUpdateResponse>('/admin/email/request-update', { newEmail });
     return response.data;
   },
 
   verifyEmailUpdate: async (newEmail: string, otp: string): Promise<StandardResponse> => {
-    const response = await api.post<StandardResponse>('/admin/email/verify-update', {
-      newEmail,
-      otp
-    });
+    const response = await api.post<StandardResponse>('/admin/email/verify-otp', { newEmail, otp });
     return response.data;
-  }
+  },
+
+  verifyPasswordUpdate: async (otp: string): Promise<StandardResponse> => {
+    const response = await api.post<StandardResponse>('/admin/password/update/verify-otp', { otp });
+    return response.data;
+  },
+
+  requestPasswordUpdate: async (data: { oldPassword?: string; newPassword?: string }): Promise<StandardResponse> => {
+    const response = await api.post<StandardResponse>('/admin/password/update', data);
+    return response.data;
+  },
 };

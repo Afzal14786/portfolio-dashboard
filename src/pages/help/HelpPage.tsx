@@ -21,7 +21,6 @@ const faqs: FAQ[] = [
   },
   {
     question: "How do I update my profile picture?",
-    // Matching the functionality we built earlier
     answer: "Go to the 'Profile' tab, click 'Edit Profile', and you can upload a new avatar directly. The system supports JPG, PNG, and WebP formats up to 5MB."
   },
   {
@@ -59,7 +58,7 @@ export default function HelpPage() {
           <h3 className="font-bold text-gray-900">API Documentation</h3>
           <p className="text-xs text-gray-500 mt-1">View Swagger REST endpoints.</p>
         </div>
-        <a href="mailto:admin@terminalx.com" className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center hover:border-blue-300 transition-colors cursor-pointer group">
+        <a href="mailto:mdafzal14777@gmail.com" className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center hover:border-blue-300 transition-colors cursor-pointer group">
           <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
             <Mail className="w-6 h-6" />
           </div>
