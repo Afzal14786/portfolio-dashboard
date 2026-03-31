@@ -104,11 +104,17 @@ export default function ProjectPage() {
               className="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-200 overflow-hidden flex flex-col transform hover:-translate-y-1 transition-all duration-300"
             >
               <div className="relative h-48 overflow-hidden bg-gray-100 border-b border-gray-100">
-                <img 
-                  src={project.imageUrl} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {project.imageUrl ? (
+                  <img 
+                    src={project.imageUrl} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <Briefcase className="w-12 h-12 text-gray-300" />
+                  </div>
+                )}
                 
                 {/* Overlay Links */}
                 <div className="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
@@ -143,8 +149,8 @@ export default function ProjectPage() {
                   {project.description}
                 </p>
                 
-                {/* Tech Stack Tags */}
-                {project.techStack && project.techStack.length > 0 && (
+                {/* Tech Stack Tags - Added Safe Check Array.isArray */}
+                {Array.isArray(project.techStack) && project.techStack.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-6 mt-auto">
                     {project.techStack.slice(0, 4).map((tech, index) => (
                       <span key={index} className="text-[11px] uppercase tracking-wider bg-gray-50 border border-gray-200 text-gray-600 px-2 py-1 rounded-md font-bold">

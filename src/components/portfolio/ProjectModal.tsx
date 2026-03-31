@@ -12,7 +12,7 @@ interface ProjectModalProps {
 }
 
 interface ApiErrorResponse {
-  response?: { data?: { message?: string; }; };
+  response?: { data?: { message?: string; error?: string }; };
   message?: string;
 }
 
@@ -32,13 +32,14 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
 
   useEffect(() => {
     if (project) {
-      setTitle(project.title);
-      setDescription(project.description);
-      setStatus(project.status);
-      setTechStack(project.techStack?.join(', ') || '');
+      setTitle(project.title || '');
+      setDescription(project.description || '');
+      setStatus(project.status || 'complete');
+      setTechStack(Array.isArray(project.techStack) ? project.techStack.join(', ') : '');
       setDemoLink(project.demoLink || '');
       setCodeLink(project.codeLink || '');
       setImagePreview(project.imageUrl || null);
+      setImage(null); // Reset file selection
     } else {
       setTitle('');
       setDescription('');
@@ -52,13 +53,27 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
     }
   }, [project, isOpen]);
 
-  useEffect(() => {
-    if (image) {
-      const objectUrl = URL.createObjectURL(image);
-      setImagePreview(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5MB");
+      return;
     }
-  }, [image]);
+    if (!file.type.startsWith('image/')) {
+      setError("Please upload a valid image file");
+      return;
+    }
+
+    setError('');
+    setImage(file);
+    
+    const objectUrl = URL.createObjectURL(file);
+    setImagePreview(objectUrl);
+    
+    return () => URL.revokeObjectURL(objectUrl);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,18 +85,25 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
       formData.append('title', title.trim());
       formData.append('description', description.trim());
       formData.append('status', status);
-      formData.append('demoLink', demoLink.trim());
-      formData.append('codeLink', codeLink.trim());
+      
+      if (demoLink.trim()) formData.append('demoLink', demoLink.trim());
+      if (codeLink.trim()) formData.append('codeLink', codeLink.trim());
       
       const tagsArray = techStack.split(',').map(tag => tag.trim()).filter(Boolean);
       formData.append('techStack', JSON.stringify(tagsArray));
 
-      if (image) formData.append('image', image);
+      // ONLY append image if a NEW file was selected
+      if (image) {
+        formData.append('image', image);
+      }
 
       if (project && project._id) {
         await portfolioService.updateProject(project._id, formData);
       } else {
-        if (!image) throw new Error("Please upload a project cover image");
+        // Create new project (Image is strictly required here)
+        if (!image) {
+          throw new Error("Please upload a project cover image");
+        }
         await portfolioService.createProject(formData);
       }
 
@@ -89,7 +111,12 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
       onClose();
     } catch (err: unknown) {
       const apiError = err as ApiErrorResponse;
-      setError(apiError.response?.data?.message || apiError.message || 'An unexpected error occurred while saving.');
+      setError(
+        apiError.response?.data?.message || 
+        apiError.response?.data?.error || 
+        apiError.message || 
+        'An unexpected error occurred while saving.'
+      );
     } finally {
       setLoading(false);
     }
@@ -179,7 +206,7 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
           </label>
           <div className="relative w-full h-48 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors group overflow-hidden cursor-pointer">
             <input 
-              type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)}
+              type="file" accept="image/*" onChange={handleImageChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
             />
             {imagePreview ? (
