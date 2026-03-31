@@ -4,49 +4,42 @@ export { default as SocialMediaLinks } from './SocialMediaLinks';
 export { default as HobbiesSection } from './HobbiesSection';
 export { default as UpdateModal } from './UpdateModal';
 
-export interface UserProfile {
-  user_name: string;
-  name: string;
-  email: string;
-  resume?: string;
-  profile_image?: string;
-  banner_image?: string;
-  social_media?: Record<string, string>;
-  hobbies: string[];
-  reading_resources: Array<{ title: string; url: string }>;
-  quote?: string;
-  blog_count: number;
-}
+// Re-export ALL types from the central source of truth
+export type { 
+  UserProfile, 
+  UpdateType, 
+  ModalDataState,
+  SocialLinks,
+  ReadingResource,
+  CloudinaryImage
+} from '../../types/user';
 
-export type UpdateType = 'banner' | 'profile' | 'reading-resource' | 'social-media' | 'hobby' | 'quote' | 'resume';
+// --- Shared Constants ---
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+export const ALLOWED_DOC_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-// Common utility functions
-export const getErrorMessage = (error: any): string => {
-  if (typeof error === 'string') return error;
-  return error?.response?.data?.message || error?.message || "An unexpected error occurred. Please try again.";
+// --- Shared Utilities ---
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const err = error as { response?: { data?: { message?: string } } };
+    return err.response?.data?.message || 'An unknown error occurred';
+  }
+  return 'An unknown error occurred';
 };
 
 export const isValidUrl = (urlString: string): boolean => {
-  if (!urlString.trim()) return false;
   try {
-    const urlWithProtocol = urlString.includes("://") ? urlString : `https://${urlString}`;
-    new URL(urlWithProtocol);
+    new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
     return true;
-  } catch (_) {
+  } catch (e) {
+    console.error(e)
     return false;
   }
 };
 
-export const formatUrl = (urlString: string): string => {
-  if (!urlString.trim()) return "";
-  return urlString.includes("://") ? urlString : `https://${urlString}`;
+export const formatUrl = (url: string): string => {
+  if (!url) return '';
+  return url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
 };
-
-// Constants
-export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-export const ALLOWED_DOC_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-];
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
