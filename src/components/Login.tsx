@@ -1,5 +1,5 @@
-import React, { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, type FormEvent } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import api from "../api/api";
@@ -43,9 +43,37 @@ const AuthBanner: React.FC = () => (
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // Added to catch OAuth token
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // OAUTH CALLBACK CATCHER
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const error = searchParams.get('error');
+
+    if (error) {
+      toast.error('Social authentication failed. Please try again.');
+      window.history.replaceState({}, document.title, '/login');
+    }
+
+    if (token) {
+      // 1. Save the token
+      localStorage.setItem('accessToken', token);
+      
+      // 2. Set default Axios header for future requests
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      // 3. Clean the URL to hide the token from the address bar
+      window.history.replaceState({}, document.title, '/login');
+      
+      // 4. Redirect to the dashboard
+      toast.success('Successfully logged in via Social Auth!');
+      navigate('/dashboard'); 
+    }
+  }, [searchParams, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -53,9 +81,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted, preventDefault called");
-
-    // Basic validation
+    
     if (!formData.email || !formData.password) {
       toast.error("Please fill in all fields");
       return;
@@ -68,8 +94,6 @@ const Login: React.FC = () => {
 
       if (res.data.success) {
         toast.success(res.data.message || "OTP sent to your email!");
-
-        // Navigate to OTP verification with login type
         navigate(
           `/verify-otp?email=${encodeURIComponent(formData.email)}&type=login`
         );
@@ -79,17 +103,12 @@ const Login: React.FC = () => {
 
       if (axios.isAxiosError(error) && error.response) {
         const status = error.response.status;
-        const message =
-          error.response.data.message || "An unexpected error occurred.";
+        const message = error.response.data.message || "An unexpected error occurred.";
 
         switch (status) {
           case 403:
             toast.error(message);
-            navigate(
-              `/verify-otp?email=${encodeURIComponent(
-                formData.email
-              )}&type=login`
-            );
+            navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}&type=login`);
             break;
           case 401:
             toast.error("Invalid email or password");
@@ -115,8 +134,12 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    toast.info(`Redirecting to ${provider} login...`);
+  // ==========================================
+  // OAUTH TRIGGER HANDLER
+  // ==========================================
+  const handleSocialLogin = (provider: 'google' | 'github') => {
+    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api/v1';
+    window.location.href = `${baseUrl}/admin/auth/oauth/${provider}`;
   };
 
   return (
@@ -236,7 +259,7 @@ const Login: React.FC = () => {
               {/* Google */}
               <button
                 type="button"
-                onClick={() => handleSocialLogin("Google")}
+                onClick={() => handleSocialLogin("google")}
                 className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-200 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg
@@ -269,7 +292,7 @@ const Login: React.FC = () => {
               {/* GitHub */}
               <button
                 type="button"
-                onClick={() => handleSocialLogin("GitHub")}
+                onClick={() => handleSocialLogin("github")}
                 className="w-full flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition duration-200 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg
