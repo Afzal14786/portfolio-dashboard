@@ -6,14 +6,12 @@ import { blogService } from '../../services/blogService';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import BlogAnalytics from './BlogAnalytics';
 
-// Extend locally to include backend metrics safely
 type ExtendedBlog = Blog & {
   readTime?: string;
   publishedAt?: string;
   shares?: number;
 };
 
-// Strict Error Interface to replace 'any'
 interface ApiError {
   response?: {
     data?: {
@@ -41,7 +39,6 @@ const BlogReading: React.FC = () => {
         setError(null);
         const response = await blogService.getBlogBySlug(slug);
         
-        // Handle nested or direct backend responses securely
         if (response.data?.data) {
           setBlog((response.data.data.blog || response.data.data) as ExtendedBlog);
         } else if (response.data) {

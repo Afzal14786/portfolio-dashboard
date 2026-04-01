@@ -173,7 +173,7 @@ const BlogManagement: React.FC = () => {
           onDelete={handleDelete}
           onViewAnalytics={handleViewAnalytics}
           loading={loading}
-          viewMode={viewMode} // FIX: Added the missing prop here!
+          viewMode={viewMode}
         />
       </div>
 

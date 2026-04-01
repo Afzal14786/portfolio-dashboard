@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import type { User } from '../types/user';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: any;
+  user: User | null;
   isLoading: boolean;
 }
 
@@ -20,12 +21,12 @@ export const useAuth = (): AuthState => {
         const userData = localStorage.getItem('userData');
         
         const isAuthenticated = !!token;
-        let user = null;
+        let user: User | null = null;
         
         if (userData) {
           try {
-            user = JSON.parse(userData);
-          } catch (error) {
+            user = JSON.parse(userData) as User;
+          } catch (error: unknown) {
             console.error('Error parsing user data:', error);
             localStorage.removeItem('userData');
           }
@@ -36,7 +37,7 @@ export const useAuth = (): AuthState => {
           user,
           isLoading: false
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error checking authentication:', error);
         setAuthState({
           isAuthenticated: false,
@@ -48,7 +49,6 @@ export const useAuth = (): AuthState => {
 
     checkAuth();
 
-    // Listen for storage changes (e.g., logout from another tab)
     const handleStorageChange = () => {
       checkAuth();
     };

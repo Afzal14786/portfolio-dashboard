@@ -17,7 +17,6 @@ interface BlogAnalyticsProps {
   onClose: () => void;
 }
 
-// Extend the base blog type locally to handle optional frontend fields safely
 type ExtendedBlog = Blog & {
   readTime?: string;
   publishedAt?: string;
@@ -48,7 +47,6 @@ const BlogAnalyticsComponent: React.FC<BlogAnalyticsProps> = ({ blog, onClose })
       setLocalError(null);
       
       try {
-        // FIX: Use the service directly to ensure correct endpoint and typing
         const data = await analyticsService.getBlogAnalytics(blog._id);
         
         if (isMounted) {

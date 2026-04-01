@@ -120,7 +120,6 @@ const Profile: React.FC = () => {
         }
       }
 
-      // FIX: Shallow merge prevents the UI from wiping other sections if the backend selects limited fields
       if (updatedProfile) {
         setUserData((prev) => prev ? { ...prev, ...updatedProfile } : updatedProfile);
       }

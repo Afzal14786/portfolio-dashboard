@@ -47,7 +47,6 @@ export default function AccountSetting() {
     setShowPass(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
-  // Step 1: Request Password Update (Sends OTP)
   const handlePasswordRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setPassError(null);
@@ -78,7 +77,6 @@ export default function AccountSetting() {
     }
   };
 
-  // Step 2: Verify Password OTP
   const handlePasswordVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setPassError(null);
@@ -100,7 +98,6 @@ export default function AccountSetting() {
     }
   };
 
-  // Step 1: Request Email Update (Sends OTP)
   const handleEmailRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError(null);
@@ -119,7 +116,6 @@ export default function AccountSetting() {
     }
   };
 
-  // Step 2: Verify Email OTP
   const handleEmailVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError(null);
@@ -133,7 +129,6 @@ export default function AccountSetting() {
       setNewEmail('');
       setEmailOtp('');
       
-      // Update local storage so the header updates immediately
       const storedUser = localStorage.getItem("userData");
       if (storedUser) {
         const user = JSON.parse(storedUser);

@@ -35,7 +35,6 @@ interface UploadResponse {
   };
 }
 
-// Extend payload locally to include images array
 interface ExtendedPayload extends BlogCreateData {
   images?: Array<{ url: string; cloudinaryId: string; alt: string; caption: string; position: number }>;
 }
@@ -158,7 +157,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     }
   };
 
-  // Helper to extract Cloudinary IDs from the HTML content to forcefully fix DB errors
   const extractImagesFromHTML = (html: string) => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
@@ -166,7 +164,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
     
     return imgTags.map((img, index) => {
       const url = img.src;
-      // Extract Cloudinary ID or fallback to a unique string
       const cloudinaryId = url.split('/').pop()?.split('.')[0] || `inline_img_${Date.now()}_${index}`;
       
       return {
@@ -202,7 +199,6 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
       let coverImageUrl = imagePreview;
       let coverImageCloudinaryId = "";
 
-      // 1. Upload Cover Image
       if (coverImageFile) {
         const imageFormData = new FormData();
         imageFormData.append("image", coverImageFile);
@@ -220,11 +216,9 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
           setLoading(false); return;
         }
       } else if (imagePreview) {
-        // If reusing an old image, try to extract its cloudinary ID
         coverImageCloudinaryId = imagePreview.split('/').pop()?.split('.')[0] || `cover_${Date.now()}`;
       }
 
-      // 2. Prepare Payload including extracted valid images
       const payload: ExtendedPayload = {
         title: formData.title,
         content: formData.content,
@@ -234,7 +228,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ blog, onClose, onSuccess }) => {
         metaTitle: formData.metaTitle,
         metaDescription: formData.metaDescription,
         scheduledFor: scheduledDate ? new Date(scheduledDate).toISOString() : undefined,
-        images: extractImagesFromHTML(formData.content) // 🔥 Overwrites corrupted DB images
+        images: extractImagesFromHTML(formData.content) 
       };
 
       if (coverImageUrl && !coverImageUrl.startsWith('data:')) {

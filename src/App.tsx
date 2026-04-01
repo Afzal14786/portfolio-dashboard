@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense } from 'react';
 import ProtectedRoute from './components/ProtectedRoute';
 import { routes } from './routes/config';
-import Layout from './components/layout/Layout'; // Import the single Layout
+import Layout from './components/layout/Layout';
 
 function App() {
   return (

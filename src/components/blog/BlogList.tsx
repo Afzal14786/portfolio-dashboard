@@ -47,7 +47,6 @@ const BlogList: React.FC<BlogListProps> = ({
     );
   }
 
-  // Dynamically switch the wrapper container class
   const containerClass = viewMode === 'list' 
     ? "flex flex-col gap-4" 
     : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8";

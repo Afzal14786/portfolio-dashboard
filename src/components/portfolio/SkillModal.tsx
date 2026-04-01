@@ -136,7 +136,7 @@ export default function SkillModal({ isOpen, onClose, skill, onSuccess }: SkillM
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Skill Icon (SVG/PNG) {(!skill || !skill.icon) && <span className="text-red-500">*</span>}
+            Skill Icon (PNG) {(!skill || !skill.icon) && <span className="text-red-500">*</span>}
           </label>
           <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-center cursor-pointer overflow-hidden group">
             <input 

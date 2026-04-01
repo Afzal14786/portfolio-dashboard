@@ -149,7 +149,6 @@ export default function ProjectPage() {
                   {project.description}
                 </p>
                 
-                {/* Tech Stack Tags - Added Safe Check Array.isArray */}
                 {Array.isArray(project.techStack) && project.techStack.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-6 mt-auto">
                     {project.techStack.slice(0, 4).map((tech, index) => (

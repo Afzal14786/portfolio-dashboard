@@ -49,21 +49,18 @@ const Modal: React.FC<ModalProps> = ({
       <div 
         className={`bg-white rounded-2xl shadow-2xl w-full ${sizeClasses[size]} flex flex-col max-h-[90vh] animate-in fade-in-90 zoom-in-95 duration-200 border border-gray-200`}
       >
-        {/* Header */}
-        {(title || onClose) && (
-          <div className="flex items-center justify-between p-5 sm:px-6 border-b border-gray-100 flex-shrink-0">
-            {title && (
-              <h2 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h2>
-            )}
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all cursor-pointer outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        )}
+        <div className={`flex items-center p-5 sm:px-6 border-b border-gray-100 flex-shrink-0 ${title ? 'justify-between' : 'justify-end'}`}>
+          {title && (
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h2>
+          )}
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all cursor-pointer outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
         
         {/* Scrollable Content */}
         <div className="overflow-y-auto flex-1 p-5 sm:p-6">
