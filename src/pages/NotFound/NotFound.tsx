@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Home, ArrowLeft, HelpCircle, Shield } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Home, ArrowLeft, HelpCircle, Shield } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
@@ -12,19 +12,19 @@ const NotFound: React.FC = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate(isAuthenticated ? '/dashboard' : '/login');
+      navigate(isAuthenticated ? "/dashboard" : "/login");
     }
   };
 
   // Handle dashboard redirect
   const handleDashboardRedirect = () => {
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   // Handle login redirect (only for unauthenticated users)
   const handleLoginRedirect = () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
     }
   };
 
@@ -46,31 +46,31 @@ const NotFound: React.FC = () => {
       return [
         {
           icon: <Home className="w-5 h-5" />,
-          label: 'Go to Dashboard',
+          label: "Go to Dashboard",
           onClick: handleDashboardRedirect,
-          primary: true
+          primary: true,
         },
         {
           icon: <ArrowLeft className="w-5 h-5" />,
-          label: 'Go Back',
+          label: "Go Back",
           onClick: handleBack,
-          primary: false
-        }
+          primary: false,
+        },
       ];
     } else {
       return [
         {
           icon: <Shield className="w-5 h-5" />,
-          label: 'Go to Login',
+          label: "Go to Login",
           onClick: handleLoginRedirect,
-          primary: true
+          primary: true,
         },
         {
           icon: <ArrowLeft className="w-5 h-5" />,
-          label: 'Go Back',
+          label: "Go Back",
           onClick: handleBack,
-          primary: false
-        }
+          primary: false,
+        },
       ];
     }
   };
@@ -86,21 +86,23 @@ const NotFound: React.FC = () => {
             <span className="text-2xl text-white font-bold">404</span>
           </div>
         </div>
-        
+
         {/* Error Message */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Page Not Found</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Page Not Found
+          </h1>
           <h2 className="text-xl font-semibold text-gray-600 mb-4">
             Lost in the digital space?
           </h2>
-          
+
           <p className="text-gray-500 mb-2">
             The page you're looking for doesn't exist or may have been moved.
           </p>
-          
+
           {isAuthenticated && user && (
             <p className="text-sm text-blue-600 font-medium">
-              Welcome back, {user.name || user.user_name || 'User'}! 
+              Welcome back, {user.name || "User"}!
             </p>
           )}
         </div>
@@ -113,8 +115,8 @@ const NotFound: React.FC = () => {
               onClick={option.onClick}
               className={`w-full flex items-center justify-center space-x-3 py-3 px-4 font-semibold rounded-xl transition-all duration-200 cursor-pointer transform hover:scale-105 ${
                 option.primary
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:from-blue-700 hover:to-purple-700 hover:shadow-xl'
-                  : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
+                  : "border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
               }`}
             >
               {option.icon}
@@ -130,7 +132,8 @@ const NotFound: React.FC = () => {
             <h3 className="font-semibold text-gray-800">Need Help?</h3>
           </div>
           <p className="text-sm text-gray-600 mb-3">
-            If you believe this is an error or need assistance, our support team is here to help.
+            If you believe this is an error or need assistance, our support team
+            is here to help.
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <a
@@ -154,9 +157,16 @@ const NotFound: React.FC = () => {
             Technical Details
           </summary>
           <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-            <p><strong>Current Path:</strong> {window.location.pathname}</p>
-            <p><strong>Status:</strong> {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</p>
-            <p><strong>User Agent:</strong> {navigator.userAgent.split(' ')[0]}</p>
+            <p>
+              <strong>Current Path:</strong> {window.location.pathname}
+            </p>
+            <p>
+              <strong>Status:</strong>{" "}
+              {isAuthenticated ? "Authenticated" : "Not Authenticated"}
+            </p>
+            <p>
+              <strong>User Agent:</strong> {navigator.userAgent.split(" ")[0]}
+            </p>
           </div>
         </details>
       </div>

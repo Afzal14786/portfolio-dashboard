@@ -19,6 +19,7 @@ interface VerificationResponse {
     };
     accessToken?: string;
     resetToken?: string;
+    refreshToken?: string;
   };
 }
 
@@ -172,7 +173,10 @@ const OtpVerification: React.FC = () => {
 
         if (type === "login" && response.data.data?.accessToken) {
           localStorage.setItem("accessToken", response.data.data.accessToken);
-          localStorage.setItem("refreshToken", response.data.data.refreshToken);
+          
+          if (response.data.data.refreshToken) {
+            localStorage.setItem("refreshToken", response.data.data.refreshToken);
+          }
 
           if (response.data.data.user) {
             localStorage.setItem(
